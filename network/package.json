@@ -1,0 +1,14 @@
+{
+  "name": "network",
+  "version": "1.0.0",
+  "description": "NetWork: a networking assistant for people who find reaching out and following up hard",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --env-file=.env server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
