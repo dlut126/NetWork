@@ -269,6 +269,39 @@ a.btn{text-decoration:none;display:inline-block}
 .me-note{font-size:14px;color:var(--soft);padding:10px 12px;background:var(--sunk);border-radius:9px}
 .steps{padding:12px 14px;border-radius:10px;background:var(--sunk);display:flex;flex-direction:column;gap:6px}
 .steps ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.connect{border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.connect.on{border-color:var(--good)}
+.connect-top{display:flex;align-items:center;gap:10px}
+.connect-name{font-weight:600}
+.pill-state{font:500 11.5px var(--mono);padding:3px 8px;border-radius:99px;background:var(--sunk);color:var(--soft)}
+.pill-state.ok{background:var(--good-wash);color:var(--good)}
+.suggest{border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.sug-row{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;padding-top:8px;border-top:1px solid var(--line)}
+@media (max-width:520px){.sug-row{grid-template-columns:40px minmax(0,1fr)}.sug-row .row{grid-column:1/-1}}
+.meet-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--line);border-radius:10px}
+.capture-in{min-height:64px;font-size:16px}
+.capture-opts{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.capture-opts .where{max-width:240px;padding:7px 11px}
+.photo-btn{display:inline-flex;gap:6px;align-items:center}
+.photo-btn svg{flex:none}
+.visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.more-links{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--faint)}
+.tagnote{font-size:12px;font-weight:500;color:var(--accent);background:var(--accent-wash);padding:2px 7px;border-radius:99px;text-decoration:none;white-space:nowrap}
+.pending-head{position:sticky;top:0;background:var(--panel);padding:6px 0;z-index:1}
+.add-to{display:flex;flex-direction:column;gap:8px}
+.chip.on{background:var(--accent-wash);border-color:var(--accent-wash);display:inline-flex;align-items:center;gap:4px;cursor:default}
+.chip.on .x{font-size:15px;padding:0 2px}
+.previews{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.pv{border-bottom:1px solid var(--line);padding:10px 14px}
+.pv:last-child{border-bottom:0}
+.pv summary{cursor:pointer;display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.pv[open] summary{margin-bottom:8px}
+.pv .row{margin-top:8px}
+.send-row{padding-top:4px}
+.ghead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ghead-act{all:unset;cursor:pointer;color:var(--accent);font-size:12px;font-weight:500}
+.ghead-act:focus-visible{outline:2px solid var(--accent);border-radius:4px}
+.pane-head .btn + .btn{margin-left:6px}
 .save-state{font:400 12px var(--mono);color:var(--faint)}
 </style>
 </head>
@@ -360,6 +393,7 @@ const hue = s => { let h = 0; for (const ch of (s||"")) h = (h*31 + ch.charCodeA
 const avatar = (name, lg) => `<span class="av${lg?" lg":""}" style="--h:${hue(name)}" aria-hidden="true">${esc(initials(name))}</span>`;
 const CADENCES = [[30,"Every month"],[90,"Every 3 months"],[180,"Every 6 months"],[365,"Once a year"],[0,"Don't remind me"]];
 const GROUPS = [["az","A–Z"],["company","Company"],["industry","Industry"],["how","How you met"],["tag","Tag"],["recency","Last contact"]];
+const GPREFIX = {company:"co", industry:"ind", how:"met", tag:"tag"};
 const RECENCY = ["Last 30 days","1–3 months ago","3–6 months ago","6+ months ago","Never contacted"];
 const ICON = {
   msg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>',
@@ -367,6 +401,7 @@ const ICON = {
   snooze:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M5 3 2 6M22 6l-3-3"/></svg>',
   prep:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 0 1 0 8h-1M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z"/><path d="M6 2v2M10 2v2M14 2v2"/></svg>',
   log:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>',
+  camera:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
   edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>'
 };
 
@@ -477,20 +512,22 @@ const MEET = {
   online:    {label:"Online", kind:"Connected online", owe:"", days:0, hint:"No follow-up owed. You'll just get the usual stay-in-touch reminder."},
 };
 // Log kinds that usually mean you owe a thank-you, and kinds that count as following up
-const OWE_ON_LOG = {"Coffee":"Send a thank-you note", "Met in person":"Send a nice-to-meet-you email", "Video call":"Send a thank-you note"};
-const FOLLOWUP_KINDS = new Set(["Email","Text","Reached out"]);
-function addOwe(p, what, days, auto){ p.owes = [...(Array.isArray(p.owes) ? p.owes : []), {id:"o"+uidGen(), what, due:addDays(days||0), done:false, auto:!!auto}]; }
+const OWE_ON_LOG = {"Coffee":"Send a thank-you note", "Call":"Send a thank-you note", "Met in person":"Send a nice-to-meet-you email", "Video call":"Send a thank-you note"};
+const FOLLOWUP_KINDS = new Set(["Email","Text","Reached out","Message"]);
+function addOwe(p, what, days, auto){ if (auto && (p.owes||[]).some(o => o.auto && !o.done)) return;   // one automatic follow-up at a time
+  p.owes = [...(Array.isArray(p.owes) ? p.owes : []), {id:"o"+uidGen(), what, due:addDays(days||0), done:false, auto:!!auto}]; }
 function resolveAutoOwes(p){ (p.owes||[]).forEach(o => { if (!o.done && o.auto){ o.done = true; o.doneOn = today(); } }); }
 const dueLabel = d => { const n = daysSince(d); if (n == null) return ""; if (n > 0) return `overdue by ${n} day${n>1?"s":""}`; if (n === 0) return "due today"; if (n === -1) return "due tomorrow"; return "due " + fmtDate(d); };
 function reasonsFor(e){
-  const r = []; let score = 0;
+  const r = []; let score = 0, cal = null;
+  for (const c of calReasonsFor(e)){ r.push(c.text); score += c.score; if (!cal) cal = c; }   // meetings: prep before, debrief after
   for (const o of e.owes){ r.push(`${o.what} (${dueLabel(o.due)})`); score += 3 + Math.max(0, Math.min(daysSince(o.due), 14))/7; }
-  if (e.snoozeUntil && e.snoozeUntil > today()) return r.length ? {r, score} : null;   // snooze hides reminders, not promises
+  if (e.snoozeUntil && e.snoozeUntil > today()) return r.length ? {r, score, cal} : null;   // snooze hides reminders, not promises
   if (e.owe.length){ r.push("You owe them: " + e.owe.join("; ")); score += 3; }
   if (e.followUp && e.followUp <= today()){ r.push(`You planned to follow up by ${fmtDate(e.followUp)}`); score += 2 + Math.min(daysSince(e.followUp), 30)/30; }
   const ds = daysSince(e.last);
   if (e.cadence > 0 && ds != null && ds >= e.cadence){ r.push(`You last talked ${ago(e.last)}`); score += 1 + Math.min(ds/e.cadence, 3)/3; }
-  return r.length ? {r, score} : null;
+  return r.length ? {r, score, cal} : null;
 }
 
 function groupsOf(e){
@@ -519,7 +556,7 @@ function render(){
 const renderList = () => renderSide();
 const renderChat = () => renderMain();
 const renderAll = () => render();
-function go(next){ sel = next; snoozeOpen = false; logOpen = false; finishOpen = false; render(); const m = $(".main-scroll"); if (m) m.scrollTop = 0; if (window.innerWidth <= 820) window.scrollTo(0,0); }
+function go(next){ if (sel.type === "me" && next.type !== "me") meDraft = null; sel = next; snoozeOpen = false; logOpen = false; finishOpen = false; render(); const m = $(".main-scroll"); if (m) m.scrollTop = 0; if (window.innerWidth <= 820) window.scrollTo(0,0); }
 
 function renderSide(){
   const {list, usingExamples} = buildNetwork();
@@ -557,7 +594,7 @@ function renderSide(){
         <span><span class="cname">Today</span><br><span class="csub">${todoN ? `${todoN} to do` : "You're all caught up"}</span></span></button>
       ${q ? `<button class="today-row" id="findEverywhere"><span class="today-ico" style="background:var(--ink)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><span style="min-width:0"><span class="cname">Smart search for “${esc(query)}”</span><br><span class="csub">Search notes and history, and find new people</span></span></button>` : ""}
       ${usingExamples ? `<div class="empty-list">Example contacts below. Tap + to add your own.</div>` : ""}
-      ${ge.map(([g, es]) => `<div class="ghead">${esc(g)}</div>${es.map(e => `
+      ${ge.map(([g, es]) => `<div class="ghead"><span>${esc(g)}</span>${GPREFIX[groupBy] && listFilter !== "reach" && !/^(No |Not )/.test(g) && es.some(e => !e.example) ? `<button class="ghead-act" data-grp="${esc(GPREFIX[groupBy] + ":" + g)}">Email group</button>` : ""}</div>${es.map(e => `
         <button class="crow" data-key="${esc(e.key)}" aria-current="${selKey===e.key}">
           ${avatar(e.name)}
           <span style="min-width:0"><span class="cname">${esc(e.name)}</span><span class="csub" style="display:block">${esc([e.role, e.firm].filter(Boolean).join(" · ") || "No details yet")}</span></span>
@@ -577,6 +614,7 @@ function renderSide(){
   $("#groupSel").onchange = e => { groupBy = e.target.value; renderSide(); };
   side.querySelectorAll("[data-filter]").forEach(b => b.onclick = () => { listFilter = b.dataset.filter; renderSide(); });
   side.querySelectorAll(".crow").forEach(b => b.onclick = () => go({type:"person", key:b.dataset.key}));
+  side.querySelectorAll("[data-grp]").forEach(b => b.onclick = () => go({type:"group", preset:b.dataset.grp}));
 }
 
 function renderMain(){
@@ -588,6 +626,7 @@ function renderMain(){
   if (t === "conv") return renderConv(m);
   if (t === "find") return renderFind(m);
   if (t === "me") return renderMe(m);
+  if (t === "group") return renderGroup(m);
   if (t === "person"){
     const e = findEntry(sel.key);
     if (!e){ sel = {type:"home"}; return renderToday(m); }
@@ -605,196 +644,252 @@ function renderToday(m){
   const showAll = sel.showAll;
   const fu = showAll ? nudges : nudges.slice(0, 3), fin = showAll ? finish : finish.slice(0, 3);
   const total = nudges.length + finish.length;
+  let meHintOff = false; try{ meHintOff = localStorage.getItem("nw-mehint") === "off"; }catch{}
+  const setup = !hasMe() ? (meHintOff ? "" : `<div class="setup"><div><b>Tell NetWork about you</b><p class="hint">Your background and goals make prep questions, intros, and drafted messages fit you. Paste your LinkedIn and it fills itself in.</p></div>
+      <div class="row" style="gap:6px"><button class="btn primary small" data-gome>Set up your profile</button><button class="btn small" id="meHintNo">Not now</button></div></div>`)
+    : (gmailTodayHTML() || calTodayHintHTML());       // at most one setup card at a time
   m.innerHTML = `
-    <div class="pane-head">${backBtn("Contacts", true)}<span class="spacer"></span><button class="btn small primary" id="todayAdd">+ Add</button></div>
+    <div class="pane-head">${backBtn("Contacts", true)}<span class="spacer"></span><button class="btn small" id="todayGroup">Group email</button><button class="btn small primary" id="todayAdd">+ Add</button></div>
     <div class="section"><h1>Today</h1>
       <div class="stats"><div class="stat"><b>${list.length}</b><span>contacts</span></div>
         <div class="stat ${total ? "hot" : ""}"><b>${total}</b><span>to do</span></div>
         <div class="stat"><b>${list.filter(e => e.last && daysSince(e.last) <= 30).length}</b><span>talked to this month</span></div></div></div>
-    ${hasMe() ? "" : `<div class="setup"><div><b>Tell NetWork about you</b><p class="hint">Your background and goals make prep questions, intros, and drafted messages fit you. Paste your LinkedIn and it fills itself in.</p></div><button class="btn primary small" data-gome>Set up your profile</button></div>`}
+    ${setup}
     <div class="section"><h2>To do</h2>
       ${!total ? `<p class="hint">Nothing to do. Everyone's followed up and every card is complete.</p>` : ""}
       ${fu.length ? `<div class="todo-group"><div class="todo-title">Follow up <span class="n">${nudges.length}</span></div>
         ${fu.map(e => `<div class="todo">
           <button class="todo-main" data-open="${esc(e.key)}">${avatar(e.name)}<span style="min-width:0"><span class="cname">${esc(e.name)}</span> <span class="csub">${esc(e.firm)}</span><br><span class="why">${esc(e.nudge.r[0])}</span></span></button>
-          ${e.example ? "" : `<div class="todo-acts"><button class="btn small" data-done="${esc(e.key)}" title="Log that you reached out">Done</button><button class="btn small" data-later="${esc(e.key)}" title="Snooze one week">Later</button></div>`}</div>`).join("")}</div>` : ""}
+          ${e.example ? "" : `<div class="todo-acts">${e.nudge.cal
+              ? `<button class="btn small primary" data-calgo="${esc(e.key)}">${e.nudge.cal.type === "prep" ? "Prep" : "Debrief"}</button><button class="btn small" data-calskip="${esc(e.key)}">Not now</button>`
+              : `<button class="btn small" data-done="${esc(e.key)}" title="Log that you reached out today">Log</button><button class="btn small" data-later="${esc(e.key)}" title="Remind me in a week">Not now</button>`}</div>`}</div>`).join("")}</div>` : ""}
       ${fin.length ? `<div class="todo-group"><div class="todo-title">Finish contact <span class="n">${finish.length}</span></div>
         ${fin.map(e => `<div class="todo">
           <button class="todo-main" data-open="${esc(e.key)}">${avatar(e.name)}<span style="min-width:0"><span class="cname">${esc(e.name)}</span><br><span class="csub">Missing ${esc(e.missing.join(", "))}</span></span></button>
-          <div class="todo-acts"><a class="btn small" href="${esc(linkedinSearch(e))}" target="_blank" rel="noopener">Find on LinkedIn</a><button class="btn small" data-fine="${esc(e.key)}" title="Stop asking about this card">It's fine</button></div></div>`).join("")}</div>` : ""}
+          <div class="todo-acts"><a class="btn small" href="${esc(linkedinSearch(e))}" target="_blank" rel="noopener">Find on LinkedIn</a><button class="btn small" data-fine="${esc(e.key)}" title="Stop asking about this card">Not now</button></div></div>`).join("")}</div>` : ""}
       ${(nudges.length > 3 || finish.length > 3) ? `<button class="btn small" id="todoAll">${showAll ? "Show fewer" : `Show all ${total}`}</button>` : ""}
+      <span class="status" id="todoSt"></span>
     </div>
-    <div class="section"><h2>Just met someone?</h2>${quickHTML("tq")}</div>
+    ${calTodayHTML()}
+    <div class="section capture">${captureHTML("tq")}</div>
     ${usingExamples ? `<div class="section"><p class="hint">You're looking at example contacts. Add your first person and your own network replaces them.</p></div>` : ""}`;
   bindBack({type:"home"});
-  $("#todayAdd").onclick = () => go({type:"add", mode:"quick"});
+  $("#todayAdd").onclick = () => go({type:"add"});
+  $("#todayGroup").onclick = () => go({type:"group"});
   m.querySelectorAll("[data-gome]").forEach(b => b.onclick = () => go({type:"me"}));
+  const mh = $("#meHintNo"); if (mh) mh.onclick = () => { try{ localStorage.setItem("nw-mehint", "off"); }catch{} renderMain(); };
+  bindGmailToday(); bindCalHint(); bindCalToday();
+  const tst = t => { const s = $("#todoSt"); if (s) s.textContent = t; };
+  m.querySelectorAll("[data-calgo]").forEach(b => b.onclick = () => { const e = findEntry(b.dataset.calgo); const c = e?.nudge?.cal; if (c) openForMeeting(e, c.it, c.type === "prep" ? "prep" : "chat"); });
+  m.querySelectorAll("[data-calskip]").forEach(b => b.onclick = () => { const e = findEntry(b.dataset.calskip); const c = e?.nudge?.cal; if (c) skipCal(e, c.it, c.type); });
   m.querySelectorAll("[data-open]").forEach(b => b.onclick = () => go({type:"person", key:b.dataset.open}));
-  m.querySelectorAll("[data-done]").forEach(b => b.onclick = () => { const e = findEntry(b.dataset.done); const p = ensurePerson(e); addLog(p, {kind:"Reached out"}); resolveAutoOwes(p); e.convs.forEach(c => { if (c.debrief && !c.thankYouSent && !c.example){ c.thankYouSent = true; persist(c, 0); } }); persist(p, 0); render(); });
-  m.querySelectorAll("[data-later]").forEach(b => b.onclick = () => { const p = ensurePerson(findEntry(b.dataset.later)); p.snoozeUntil = addDays(7); persist(p, 0); render(); });
+  m.querySelectorAll("[data-done]").forEach(b => b.onclick = () => { const e = findEntry(b.dataset.done); touchPerson(e, true); tst(`Logged that you reached out to ${e.name.split(" ")[0]}.`); });
+  m.querySelectorAll("[data-later]").forEach(b => b.onclick = () => { const e = findEntry(b.dataset.later); const p = ensurePerson(e); p.snoozeUntil = addDays(7); persist(p, 0); render(); tst(`OK. ${e.name.split(" ")[0]} comes back on ${fmtDate(p.snoozeUntil)}.`); });
   m.querySelectorAll("[data-fine]").forEach(b => b.onclick = () => { const p = ensurePerson(findEntry(b.dataset.fine)); p.complete = true; persist(p, 0); render(); });
   const ta = $("#todoAll"); if (ta) ta.onclick = () => { sel = {...sel, showAll:!showAll}; renderMain(); };
-  bindQuick("tq");
+  bindCapture("tq");
 }
 
-// ---------- Add ----------
-const ADD_MODES = [
-  ["quick","Just met someone","Name and where. Fill in the rest later."],
-  ["tell","Describe them","Say or type a sentence; it fills in the details."],
-  ["log","Log a conversation","You talked to someone already in your contacts."],
-  ["full","Full details","Every field, for when you have them all."],
-  ["import","Import contacts","From LinkedIn, Google, iPhone, or a spreadsheet."]
-];
-let quickContext = "";
-
-function renderAdd(m){
-  const mode = sel.mode || "quick";
-  m.innerHTML = `<div class="pane-head">${backBtn("Contacts", true)}<span class="spacer"></span></div>
-    <div class="section"><h1>Add</h1>
-      <div class="modes" role="tablist" aria-label="How do you want to add?">${ADD_MODES.map(([k,t,d]) => `
-        <button class="mode" role="tab" aria-selected="${mode===k}" data-mode="${k}"><span class="mt">${t}</span><span class="md">${d}</span></button>`).join("")}</div></div>
-    <div class="section" id="addBody"></div>`;
-  bindBack({type:"home"});
-  m.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => {
-    if (b.dataset.mode === "full"){ draftForm = {lastContact:today(), cadence:90, tags:[]}; go({type:"edit", key:null}); return; }
-    sel = {type:"add", mode:b.dataset.mode}; renderAdd(m);
-  });
-  const body = $("#addBody");
-  if (mode === "quick"){ body.innerHTML = quickHTML("aq"); bindQuick("aq"); }
-  else if (mode === "tell"){ body.innerHTML = tellHTML(); bindTell(); }
-  else if (mode === "log"){ body.innerHTML = logHTML(); bindLog(); }
-  else if (mode === "import"){ body.innerHTML = importHTML(); bindImport(); }
+// ---------- Add (one box: a name, a sentence, or a photo) ----------
+let quickContext = "";          // "Where": remembered so you can add a whole event quickly
+let quickMet = "in_person", capU = "aq";
+const NAME_STOP = new Set(["met","meet","at","from","with","and","the","a","an","had","have","coffee","call","called","talked","talk","she","he","they","her","his","is","was","works","work","to","for","today","yesterday","who","we","i","my","about","in","on","said","follow","up"]);
+function isJustName(t){
+  const w = t.trim().split(/\s+/);
+  if (!w.length || w.length > 4 || /[0-9@,.;:!?()]/.test(t.replace(/\.(?=\s|$)/g, ""))) return false;
+  return w.every(x => /^[\p{L}][\p{L}'’-]*\.?$/u.test(x) && !NAME_STOP.has(x.toLowerCase()));
 }
 
-// Just met someone: name + where, saved in one tap
-let quickMet = "in_person";
-function quickHTML(u){
-  return `<div class="field"><span class="label">How did you meet?</span>
-      <div class="chips" id="${u}-met">${Object.entries(MEET).map(([k,v]) => `<button type="button" class="chip" data-met="${k}" aria-pressed="${quickMet===k}">${v.label}</button>`).join("")}</div>
-      <span class="hint" id="${u}-methint">${MEET[quickMet].hint}</span></div>
-    <div class="quick-grid">
-      <div class="field"><label class="label" for="${u}-name">Name</label><input id="${u}-name" autocomplete="off" placeholder="Sarah Kim" enterkeyhint="done"></div>
-      <div class="field"><label class="label" for="${u}-ctx">Where <span class="opt">optional</span></label><input id="${u}-ctx" placeholder="Alumni networking night"></div>
-      <div class="field"><label class="label" for="${u}-firm">Company <span class="opt">optional</span></label><input id="${u}-firm" placeholder="Google"></div>
+function captureHTML(u){
+  return `<label class="label" for="${u}-in">Who did you meet?</label>
+    <textarea id="${u}-in" class="capture-in" rows="2" placeholder="Type a name, or describe who you met. You can also tap your keyboard's microphone and say it."></textarea>
+    <div class="capture-opts">
+      <div class="chips" id="${u}-met" role="group" aria-label="How you met">${Object.entries(MEET).map(([k,v]) => `<button type="button" class="chip" data-met="${k}" aria-pressed="${quickMet===k}">${v.label}</button>`).join("")}</div>
+      <input id="${u}-ctx" class="where" placeholder="Where (optional)" aria-label="Where you met">
     </div>
-    <div class="row"><button class="btn primary" id="${u}-save">Save</button><span class="status" id="${u}-st"></span></div>`;
+    <div class="row">
+      <button class="btn primary" id="${u}-go">Add</button>
+      <label class="btn photo-btn" for="${u}-photo" ${sample ? "" : "hidden"}>${ICON.camera} Photo</label>
+      <input type="file" id="${u}-photo" accept="image/*" class="visually-hidden">
+      <span class="status" id="${u}-st"></span>
+    </div>
+    <p class="hint">${sample ? "A photo of a sign-up sheet, business card, or name tags adds everyone on it. " : ""}Mention someone already in your contacts and it logs the conversation instead.</p>
+    <div class="more-links"><button class="linkish" id="${u}-full">Fill in every field</button><span aria-hidden="true">·</span><button class="linkish" id="${u}-imp">Import contacts</button></div>
+    <div id="pendingOut" class="pending"></div>`;
 }
-
-function bindQuick(u){
-  const name = $("#"+u+"-name"), ctx = $("#"+u+"-ctx"), firm = $("#"+u+"-firm"), st = $("#"+u+"-st");
+function bindCapture(u){
+  capU = u;
+  const box = $("#"+u+"-in"), ctx = $("#"+u+"-ctx"), st = $("#"+u+"-st");
+  try{ box.value = sessionStorage.getItem("nw-qa") || ""; }catch{}
+  box.oninput = () => { try{ sessionStorage.setItem("nw-qa", box.value); }catch{} };
   ctx.value = quickContext;
+  ctx.oninput = () => { quickContext = ctx.value.trim(); };
   document.querySelectorAll(`#${u}-met .chip`).forEach(b => b.onclick = () => {
     quickMet = b.dataset.met;
     document.querySelectorAll(`#${u}-met .chip`).forEach(x => x.setAttribute("aria-pressed", x === b));
-    $("#"+u+"-methint").textContent = MEET[quickMet].hint;
+    st.className = "status"; st.textContent = MEET[quickMet].hint;
   });
-  const save = () => {
-    if (!name.value.trim()){ st.className = "status err"; st.textContent = "Add a name."; name.focus(); return; }
-    quickContext = ctx.value.trim();
-    const p = savePerson({name:name.value, firm:firm.value, howMet:quickContext, metHow:quickMet, lastContact:today(), cadence:90}, null, false, u+"-st");
-    if (!p) return;
-    renderSide();
-    name.value = ""; firm.value = ""; name.focus();
-    const e = findEntry(keyOf(p.name, p.firm));
-    st.className = "status";
-    st.innerHTML = `Saved <button class="linkish" id="${u}-open">${esc(p.name)}</button>. <a href="${esc(linkedinSearch(e))}" target="_blank" rel="noopener">Find on LinkedIn</a> now, or later from To do.`;
-    $("#"+u+"-open").onclick = () => go({type:"person", key:keyOf(p.name, p.firm)});
-  };
-  $("#"+u+"-save").onclick = save;
-  [name, ctx, firm].forEach(el => el.addEventListener("keydown", ev => { if (ev.key === "Enter"){ ev.preventDefault(); save(); } }));
-}
-
-function tellHTML(){
-  return `<p class="hint">Write it the way you'd tell a friend, or tap your keyboard's microphone and say it. You can describe more than one person.</p>
-    <textarea id="qa" placeholder="Met Sarah Kim at the alumni networking night. She's a PM at Google Maps, used to be at Bain, loves climbing. Follow up next week about the APM program."></textarea>
-    <div class="row"><button class="btn primary" id="qaBtn">Add</button><span class="status" id="qaStatus">${sample ? "" : "This needs Claude, which isn't available here. Use “Just met someone” instead."}</span></div>
-    <div id="pendingOut" class="pending"></div>`;
-}
-function bindTell(){
-  const qa = $("#qa");
-  try{ qa.value = sessionStorage.getItem("nw-qa") || ""; }catch{}
-  qa.oninput = () => { try{ sessionStorage.setItem("nw-qa", qa.value); }catch{} };
-  $("#qaBtn").disabled = !sample;
-  $("#qaBtn").onclick = runQuickAdd;
+  $("#"+u+"-go").onclick = () => runCapture(u);
+  box.addEventListener("keydown", ev => { if (ev.key === "Enter" && !ev.shiftKey && isJustName(box.value)){ ev.preventDefault(); runCapture(u); } });
+  $("#"+u+"-photo").onchange = () => { const f = $("#"+u+"-photo").files?.[0]; if (f) runPhoto(u, f); $("#"+u+"-photo").value = ""; };
+  $("#"+u+"-full").onclick = () => { draftForm = {lastContact:today(), cadence:90, tags:[], howMet:quickContext, metHow:quickMet}; go({type:"edit", key:null}); };
+  $("#"+u+"-imp").onclick = () => go({type:"add", mode:"import"});
   drawPending();
 }
+function renderAdd(m){
+  if (sel.mode === "import"){
+    m.innerHTML = `<div class="pane-head"><button class="back" id="backBtn">‹ Add people</button><span class="spacer"></span></div>
+      <div class="section"><h1>Import contacts</h1>${importHTML()}</div>`;
+    bindBack({type:"add"}); bindImport(); return;
+  }
+  m.innerHTML = `<div class="pane-head">${backBtn("Contacts", true)}<span class="spacer"></span></div>
+    <div class="section capture"><h1>Add people</h1>${captureHTML("aq")}</div>`;
+  bindBack({type:"home"}); bindCapture("aq");
+  $("#aq-in").focus();
+}
+
+async function runCapture(u){
+  const box = $("#"+u+"-in"), st = $("#"+u+"-st"), btn = $("#"+u+"-go");
+  const text = box.value.trim();
+  quickContext = $("#"+u+"-ctx").value.trim();
+  if (!text){ st.className = "status err"; st.textContent = "Type a name or describe who you met."; box.focus(); return; }
+  const {list} = buildNetwork();
+  const real = list.filter(e => !e.example);
+  // Just a name: save right away, no AI needed
+  if (isJustName(text) || !sample){
+    if (!isJustName(text)){ st.className = "status err"; st.textContent = "Describing people needs AI, which isn't available here. Type just their name, or use Fill in every field."; return; }
+    const same = real.find(e => e.name.toLowerCase() === text.toLowerCase());
+    if (same){
+      st.className = "status";
+      st.innerHTML = `${esc(same.name)} is already in your contacts. <button class="linkish" id="${u}-open">Open their card</button> to log a conversation.`;
+      $("#"+u+"-open").onclick = () => go({type:"person", key:same.key}); return;
+    }
+    const p = savePerson({name:text, howMet:quickContext, metHow:quickMet, lastContact:today(), cadence:90}, null, false, u+"-st");
+    if (!p) return;
+    box.value = ""; try{ sessionStorage.removeItem("nw-qa"); }catch{}
+    renderSide(); box.focus();
+    const e = findEntry(keyOf(p.name, p.firm));
+    st.className = "status";
+    st.innerHTML = `Saved <button class="linkish" id="${u}-open">${esc(p.name)}</button>. <a href="${esc(linkedinSearch(e))}" target="_blank" rel="noopener">Find on LinkedIn</a>${quickContext ? ` · Add the next person from ${esc(quickContext)}` : ""}`;
+    $("#"+u+"-open").onclick = () => go({type:"person", key:keyOf(p.name, p.firm)});
+    return;
+  }
+  // A sentence: the AI picks out each person, and spots people already in contacts
+  btn.disabled = true; st.className = "status"; st.textContent = "Reading…";
+  const known = real.map(e => `- ${e.name} (${e.firm||"no company"})`).join("\n");
+  const prompt = `Turn this note into contact records for a personal networking tracker. The note may describe meeting new people, or talking to people already in the user's contacts, or both. Today is ${today()}. Resolve relative dates ("next week", "last Tuesday") to YYYY-MM-DD. Use only what the note says; leave a field "" when it isn't mentioned. Industry may be inferred from a well-known company. Tags are 1-3 short labels for the context (an event, school, club, or group).
+If someone clearly matches a person in the existing contacts list, use that exact name and company and set "existing": true, and set "kind" to what happened ("Coffee", "Call", "Message", "Video call", "Met in person", or "Talked").
+
+Reply with only JSON: {"people": [{"existing": false, "kind": "", "name": "", "firm": "", "role": "", "industry": "", "email": "", "phone": "", "howMet": "short, where they met", "metHow": "in_person" | "video" | "intro" | "online" | "", "introducedBy": "", "tags": [], "notes": "1-2 sentences of professional details or what was discussed", "remember": ["personal details worth remembering: family, hobbies, plans, what they asked for"], "lastContact": "YYYY-MM-DD, default today", "followUp": "YYYY-MM-DD or empty"}]}
+metHow: "in_person" for face to face, "video" for a video call, "intro" if someone introduced them, "online" for LinkedIn or other online-only contact, "" if unclear.
+
+EXISTING CONTACTS:
+${known || "(none)"}
+
+${quickContext ? `WHERE (the user typed this separately): ${quickContext}\n\n` : ""}NOTE:
+${text}`;
+  try{
+    const r = await sample.json(prompt, {modelTier:"quick"});
+    const ppl = (r?.people||[]).filter(p => p && p.name);
+    if (!ppl.length) throw {code:"invalid_json"};
+    for (const p of ppl.reverse()){
+      const match = real.find(e => keyOf(e.name,e.firm) === keyOf(p.name,p.firm)) || (p.existing ? real.find(e => e.name.toLowerCase() === String(p.name).toLowerCase()) : null);
+      pending.unshift({uid:uidGen(), matchKey: match?.key || null, data:{...p,
+        firm: match ? match.firm : p.firm, howMet: p.howMet || quickContext, lastContact: p.lastContact || today(), metHow: MEET[p.metHow] ? p.metHow : quickMet,
+        notes:[p.notes, p.introducedBy ? `Introduced by ${p.introducedBy}.` : ""].filter(Boolean).join(" "),
+        tags:Array.isArray(p.tags)?p.tags:[], cadence:match?.cadence ?? 90}});
+    }
+    st.textContent = ppl.length === 1 ? "Check the details, then save." : `Found ${ppl.length} people. Check the details, then save.`;
+    drawPending();
+  }catch(e){ st.className = "status err"; st.textContent = e?.code === "invalid_json" ? "Couldn't find anyone in that. Include at least a name." : errCopy(e); }
+  finally{ btn.disabled = false; }
+}
+
+// A photo of a sign-up sheet, business card, name tags, or attendee list
+async function runPhoto(u, file){
+  const st = $("#"+u+"-st");
+  quickContext = $("#"+u+"-ctx").value.trim();
+  if (!sample){ st.className = "status err"; st.textContent = "Reading photos needs AI, which isn't available here."; return; }
+  const lim = await (sample.limits ? sample.limits() : Promise.resolve(null)).catch(() => null);
+  if (!lim?.images){ st.className = "status err"; st.textContent = "Photos can't be read in this view. Type the names instead."; return; }
+  st.className = "status"; st.textContent = "Reading the photo… (this can take up to a minute)";
+  const {list} = buildNetwork();
+  const real = list.filter(e => !e.example);
+  try{
+    const r = await sample.json(`The user took this photo to add people to their networking contacts. It may show a sign-up sheet, attendee list, business card(s), name tags, or a slide with names. Extract every person whose name you can read clearly.
+Rules: include only names you can actually read, and skip rows you can't read rather than guessing. Never invent a company, role, or email; leave a field "" when it isn't written. If the page shows an event name or title, put it in "event".
+Reply with only JSON: {"event": "", "unreadable": 0, "people": [{"name": "", "firm": "", "role": "", "email": "", "phone": "", "linkedin": "", "notes": "anything else written next to them"}]}`, {images:file});
+    const ppl = (r?.people||[]).filter(p => p && String(p.name||"").trim());
+    if (!ppl.length){ st.className = "status err"; st.textContent = "Couldn't read any names in that photo. Try a sharper, closer photo with good light."; return; }
+    const where = quickContext || String(r.event || "").trim();
+    const group = ppl.length > 5;
+    for (const p of ppl.reverse()){
+      const match = real.find(e => keyOf(e.name,e.firm) === keyOf(p.name,p.firm)) || real.find(e => e.name.toLowerCase() === String(p.name).trim().toLowerCase() && !p.firm);
+      pending.unshift({uid:uidGen(), matchKey: match?.key || null, data:{...p, name:String(p.name).trim(), firm: match && !p.firm ? match.firm : (p.firm||""),
+        howMet: where, metHow: quickMet, tags: [], cadence: 90, lastContact: today(), oweFollowUp: !group}});
+    }
+    const bad = Number(r.unreadable) || 0;
+    st.textContent = `Found ${ppl.length} ${ppl.length === 1 ? "person" : "people"}${where ? ` from ${where}` : ""}${bad ? ` (${bad} row${bad>1?"s were":" was"} too hard to read)` : ""}. Check them, then save.`
+      + (group ? " Follow-up reminders are off for a group this size so your to-do list doesn't fill up; use Group email to write to everyone at once." : "");
+    drawPending();
+  }catch(e){
+    st.className = "status err";
+    st.textContent = e?.code === "image_rejected" ? "That photo couldn't be used. Try a JPEG or PNG under 20 MB." : e?.code === "invalid_json" ? "Couldn't read that photo. Try again with a sharper photo." : errCopy(e);
+  }
+}
+
 function drawPending(){
   const out = $("#pendingOut"); if (!out) return;
   if (!pending.length){ out.innerHTML = ""; return; }
-  out.innerHTML = `${pending.map(it => { const d = it.data; const open = it.open; return `<div class="pcard" data-u="${it.uid}">
+  const n = pending.length;
+  out.innerHTML = `${n > 1 ? `<div class="row pending-head"><button class="btn primary" id="saveAll">Save all ${n}</button><button class="btn" id="discardAll">Discard all</button></div>` : ""}
+    ${pending.map(it => { const d = it.data; const open = it.open; return `<div class="pcard" data-u="${it.uid}">
       <div class="pc-top">${avatar(d.name)}<div style="min-width:0;flex:1">
-        <div class="cname">${esc(d.name)} ${it.matchKey ? `<span class="ex" style="color:var(--accent);background:var(--accent-wash)">Already in contacts</span>` : ""}</div>
-        <div class="csub" style="white-space:normal">${esc([d.role, d.firm].filter(Boolean).join(" · ") || "No company noted")}${d.howMet ? " · met " + esc(d.howMet) : ""}${d.followUp ? " · follow up " + esc(fmtDate(d.followUp)) : ""}</div>
-        ${!it.matchKey && MEET[d.metHow] ? `<div class="hint" style="margin-top:4px">${esc(MEET[d.metHow].label)}. ${esc(MEET[d.metHow].hint)}</div>` : ""}
+        <div class="cname">${esc(d.name)} ${it.matchKey ? `<span class="tagnote">Already in contacts: logs a ${esc((d.kind || "conversation").toLowerCase())}</span>` : ""}</div>
+        <div class="csub" style="white-space:normal">${esc([d.role, d.firm].filter(Boolean).join(" · ") || "No company noted")}${d.email ? " · " + esc(d.email) : ""}${d.followUp ? " · follow up " + esc(fmtDate(d.followUp)) : ""}</div>
         ${d.notes ? `<div class="hint" style="margin-top:4px">${esc(d.notes)}</div>` : ""}</div></div>
       ${open ? `<div class="parsed">${formHTML(it.uid, d, true)}</div>` : ""}
-      <div class="row"><button class="btn primary small" data-save="${it.uid}">${it.matchKey ? "Update" : "Save"}</button>
+      <div class="row"><button class="btn primary small" data-save="${it.uid}">${it.matchKey ? "Log it" : "Save"}</button>
         <button class="btn small" data-edit="${it.uid}">${open ? "Hide details" : "Edit"}</button>
-        <button class="btn small" data-discard="${it.uid}">Discard</button><span class="status" id="${it.uid}-st"></span></div></div>`; }).join("")}
-    ${pending.length > 1 ? `<div class="row"><button class="btn primary" id="saveAll">Save all ${pending.length}</button></div>` : ""}`;
+        <button class="btn small" data-discard="${it.uid}">Discard</button><span class="status" id="${it.uid}-st"></span></div></div>`; }).join("")}`;
   for (const it of pending) if (it.open) bindForm(out.querySelector(`[data-u="${it.uid}"] .parsed`), it.data);
   out.querySelectorAll("[data-save]").forEach(b => b.onclick = () => {
     const it = pending.find(x => x.uid === b.dataset.save);
     const p = savePerson(it.data, it.matchKey, false, it.uid+"-st"); if (!p) return;
-    pending = pending.filter(x => x !== it); afterPendingSave(p);
+    pending = pending.filter(x => x !== it); afterPendingSave(p, 1);
   });
   out.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => { const it = pending.find(x => x.uid === b.dataset.edit); it.open = !it.open; drawPending(); });
   out.querySelectorAll("[data-discard]").forEach(b => b.onclick = () => { pending = pending.filter(x => x.uid !== b.dataset.discard); drawPending(); });
-  const sa = $("#saveAll"); if (sa) sa.onclick = () => { let last, n = 0; for (const it of [...pending]){ const p = savePerson(it.data, it.matchKey, false, it.uid+"-st"); if (p){ last = p; n++; pending = pending.filter(x => x !== it); } } if (last) afterPendingSave(last, n); };
+  const sa = $("#saveAll"); if (sa) sa.onclick = async () => {
+    sa.disabled = true; let last, n = 0; const saved = [];
+    for (const it of [...pending]){ const p = savePerson(it.data, it.matchKey, false, it.uid+"-st", true); if (p){ last = p; n++; saved.push(p); pending = pending.filter(x => x !== it); } }
+    await persistMany(saved, null);
+    if (last) afterPendingSave(last, n);
+  };
+  const da = $("#discardAll"); if (da) da.onclick = () => { pending = []; drawPending(); };
 }
 function afterPendingSave(p, n){
-  if (!pending.length){ try{ sessionStorage.removeItem("nw-qa"); }catch{} const qa = $("#qa"); if (qa) qa.value = ""; }
+  if (!pending.length){ try{ sessionStorage.removeItem("nw-qa"); }catch{} const box = document.querySelector(".capture-in"); if (box) box.value = ""; }
   renderSide(); drawPending();
-  const st = $("#qaStatus"); if (st){ st.className = "status"; st.textContent = n > 1 ? `Saved ${n} people.` : `Saved ${p.name}.`; }
+  const st = $("#" + capU + "-st");
+  if (st){ st.className = "status"; st.textContent = n > 1 ? `Saved ${n} people.` : `Saved ${p.name}.`; }
 }
 
-// Log a conversation with someone already in contacts
-let logPick = null;
-function logHTML(){
-  return `<div class="field"><label class="label" for="logSearch">Who did you talk to?</label>
-      <input id="logSearch" placeholder="Start typing a name" autocomplete="off"></div>
-    <div id="logMatches" class="log-matches"></div>
-    <div id="logRest"></div>`;
-}
-function bindLog(){
-  const {list} = buildNetwork();
-  const real = list.filter(e => !e.example);
-  const s = $("#logSearch"), out = $("#logMatches"), rest = $("#logRest");
-  const drawMatches = () => {
-    const q = s.value.trim().toLowerCase();
-    const ms = (q ? real.filter(e => (e.name + " " + e.firm).toLowerCase().includes(q)) : real.slice().sort((a,b) => (b.last||"").localeCompare(a.last||""))).slice(0, 6);
-    out.innerHTML = !real.length ? `<p class="hint">No contacts yet. Use “Just met someone” to add your first.</p>`
-      : ms.map(e => `<button class="crow" data-key="${esc(e.key)}" aria-current="${logPick===e.key}">${avatar(e.name)}<span style="min-width:0"><span class="cname">${esc(e.name)}</span><span class="csub" style="display:block">${esc(e.firm || "")}${e.last ? " · last talked " + esc(ago(e.last)) : ""}</span></span><span></span></button>`).join("")
-        || `<p class="hint">No one matches. Use “Just met someone” to add them.</p>`;
-    out.querySelectorAll(".crow").forEach(b => b.onclick = () => { logPick = b.dataset.key; drawMatches(); drawRest(); });
-  };
-  const drawRest = () => {
-    const e = real.find(x => x.key === logPick);
-    if (!e){ rest.innerHTML = ""; return; }
-    rest.innerHTML = `<div style="margin-top:12px">${logFormHTML("lg")}</div>`;
-    bindLogForm("lg", e, (who) => {
-      logPick = null; s.value = ""; drawMatches(); rest.innerHTML = "";
-      const st = document.createElement("p"); st.className = "status"; st.textContent = `Logged your conversation with ${who}.`; out.before(st);
-    });
-  };
-  s.oninput = drawMatches;
-  drawMatches(); drawRest();
-}
+// Log form on a contact's card
 function logFormHTML(u){
-  const kinds = ["Coffee","Met in person","Video call","Call","Text","Email","Talked"];
+  const kinds = ["Message","Coffee","Call","Video call","Met in person","Talked"];
   return `<div class="fields">
       <div class="field full"><span class="label">What happened</span><div class="chips" id="${u}-kinds">${kinds.map((k,i) => `<button type="button" class="chip" data-kind="${k}" aria-pressed="${i===0}">${k}</button>`).join("")}</div></div>
-      <div class="field full"><label class="row" style="gap:8px"><input type="checkbox" id="${u}-owe" checked style="width:18px;height:18px;accent-color:var(--accent)"> <span id="${u}-owetext">Remind me to send a thank-you note tomorrow</span></label></div>
-      <div class="field"><label class="label" for="${u}-date">When</label><input id="${u}-date" type="date" value="${today()}" max="${today()}"></div>
-      <div class="field"><label class="label" for="${u}-fu">Follow up by <span class="opt">optional</span></label><input id="${u}-fu" type="date"></div>
-      <div class="field full"><label class="label" for="${u}-note">What you talked about <span class="opt">optional</span></label><textarea id="${u}-note" placeholder="She's moving to the NYC office in January. Wants intros to anyone in fintech."></textarea></div>
-      <div class="field full"><label class="label" for="${u}-rem">Anything to remember about them? <span class="opt">optional</span></label><input id="${u}-rem" placeholder="Daughter starts kindergarten this fall"></div></div>
+      <div class="field full" hidden><label class="row" style="gap:8px"><input type="checkbox" id="${u}-owe" style="width:18px;height:18px;accent-color:var(--accent)"> <span id="${u}-owetext"></span></label></div>
+      <div class="field full"><label class="label" for="${u}-note">Notes <span class="opt">optional</span></label><textarea id="${u}-note" rows="2" placeholder="What you talked about, what they asked for, what's next."></textarea></div>
+      <details class="more field full"><summary>Date and follow-up</summary><div class="fields">
+        <div class="field"><label class="label" for="${u}-date">When</label><input id="${u}-date" type="date" value="${today()}" max="${today()}"></div>
+        <div class="field"><label class="label" for="${u}-fu">Follow up by <span class="opt">optional</span></label><input id="${u}-fu" type="date"></div></div></details></div>
     <div class="row"><button class="btn primary" id="${u}-save">Log it</button><button class="btn" id="${u}-cancel">Cancel</button></div>`;
 }
-
 function bindLogForm(u, e, after){
-  let kind = "Coffee";
-  const oweRow = $("#"+u+"-owe").closest(".field"), oweBox = $("#"+u+"-owe"), oweText = $("#"+u+"-owetext");
+  let kind = "Message";
+  const oweBox = $("#"+u+"-owe"), oweRow = oweBox.closest(".field"), oweText = $("#"+u+"-owetext");
   const syncOwe = () => {
     const what = OWE_ON_LOG[kind];
     oweRow.hidden = !what; oweBox.checked = !!what;
@@ -812,7 +907,6 @@ function bindLogForm(u, e, after){
     if (FOLLOWUP_KINDS.has(kind)) resolveAutoOwes(p);
     if (OWE_ON_LOG[kind] && oweBox.checked) addOwe(p, OWE_ON_LOG[kind], Math.max(0, 1 - (daysSince(when)||0)), true);
     const fu = $("#"+u+"-fu").value; if (fu) p.followUp = fu;
-    const rem = $("#"+u+"-rem").value.trim(); if (rem) p.remember = [...(p.remember||[]), rem];
     if (FOLLOWUP_KINDS.has(kind)) e.convs.forEach(c => { if (c.debrief && !c.thankYouSent && !c.example && c.date <= when){ c.thankYouSent = true; persist(c, 0); } });
     persist(p, 0); renderSide();
     after(e.name, false);
@@ -852,7 +946,7 @@ function bindForm(scope, d){
 }
 
 // Create or update a person record from form data. replaceAll = true for the edit form.
-function savePerson(d, matchKey, replaceAll, statusId){
+function savePerson(d, matchKey, replaceAll, statusId, noPersist){
   if (!d.name?.trim()){ const st = document.getElementById(statusId); if (st){ st.className = "status err"; st.textContent = "Add a name."; } return null; }
   const {list} = buildNetwork();
   const e = list.find(x => !x.example && (x.key === matchKey || (!replaceAll && keyOf(x.name,x.firm) === keyOf(d.name,d.firm))));
@@ -870,7 +964,10 @@ function savePerson(d, matchKey, replaceAll, statusId){
       for (const k of ["role","industry","howMet","followUp","email","phone","linkedin"]) if (clean[k]) p[k] = clean[k];
       p.tags = [...new Set([...(p.tags||[]), ...clean.tags])];
       if (clean.notes) p.notes = p.notes ? `${p.notes}\n${fmtDate(clean.lastContact||today())}: ${clean.notes}` : clean.notes;
-      if (clean.lastContact && clean.lastContact > (p.lastContact||"")) addLog(p, {date:clean.lastContact, kind:"Talked", note:clean.notes});
+      const kind = d.kind || "Talked";
+      if (clean.lastContact) addLog(p, {date:clean.lastContact, kind, note:clean.notes});
+      if (FOLLOWUP_KINDS.has(kind)) resolveAutoOwes(p);
+      if (OWE_ON_LOG[kind] && d.oweFollowUp !== false) addOwe(p, OWE_ON_LOG[kind], Math.max(0, 1 - (daysSince(clean.lastContact || today())||0)), true);
       if (Array.isArray(d.remember) && d.remember.length) p.remember = [...new Set([...(p.remember||[]), ...d.remember.filter(Boolean)])];
     }
   } else {
@@ -881,40 +978,8 @@ function savePerson(d, matchKey, replaceAll, statusId){
     if (mh?.owe && d.oweFollowUp !== false && (daysSince(clean.lastContact || today()) ?? 0) <= 7) addOwe(p, mh.owe, Math.max(0, mh.days - (daysSince(clean.lastContact || today()) || 0)), true);
     people.push(p);
   }
-  persist(p, 0);
+  if (!noPersist) persist(p, 0);
   return p;
-}
-
-async function runQuickAdd(){
-  const qa = $("#qa"), st = $("#qaStatus"), btn = $("#qaBtn");
-  const text = qa.value.trim();
-  if (!text){ st.className = "status err"; st.textContent = "Say or type who you met first."; return; }
-  btn.disabled = true; st.className = "status"; st.textContent = "Reading…";
-  const {list} = buildNetwork();
-  const known = list.filter(e => !e.example).map(e => `- ${e.name} (${e.firm||"no company"})`).join("\n");
-  const prompt = `Turn these notes about meeting or talking to people into contact records for a personal networking tracker. The notes may describe one person or several. Today is ${today()}. Resolve relative dates ("next week", "last Tuesday") to YYYY-MM-DD. Use only what the notes say; leave a field "" when not mentioned. Industry may be inferred from a well-known company. Tags are 1-3 short labels for the context (an event, school, club, or group) taken from the notes.
-If someone clearly matches a person in the existing contacts list, use that exact name and company.
-
-Reply with only JSON: {"people": [{"name": "", "firm": "", "role": "", "industry": "", "email": "", "phone": "", "howMet": "short", "tags": [], "notes": "1-2 sentences of professional details", "remember": ["personal details worth remembering: family, hobbies, plans, what they asked for"], "metHow": "in_person" | "video" | "intro" | "online" | "", "introducedBy": "name or empty", "lastContact": "YYYY-MM-DD, default today", "followUp": "YYYY-MM-DD or empty"}]}
-metHow: "in_person" if they met face to face (an event, office, class), "video" for a Zoom or video call, "intro" if someone introduced them by email or message, "online" for LinkedIn or other online-only contact, "" if unclear.
-
-EXISTING CONTACTS:
-${known || "(none)"}
-
-NOTES:
-${text}`;
-  try{
-    const r = await sample.json(prompt, {modelTier:"quick"});
-    const ppl = (r?.people||[]).filter(p => p && p.name);
-    if (!ppl.length) throw {code:"invalid_json"};
-    for (const p of ppl.reverse()){
-      const match = list.find(e => !e.example && keyOf(e.name,e.firm) === keyOf(p.name,p.firm));
-      pending.unshift({uid:uidGen(), matchKey: match?.key || null, data:{...p, metHow: MEET[p.metHow] ? p.metHow : "", notes:[p.notes, p.introducedBy ? `Introduced by ${p.introducedBy}.` : ""].filter(Boolean).join(" "), tags:Array.isArray(p.tags)?p.tags:[], cadence:match?.cadence ?? 90}});
-    }
-    st.textContent = `Found ${ppl.length} ${ppl.length===1?"person":"people"}. Check the details, then save.`;
-    drawPending();
-  }catch(e){ st.className = "status err"; st.textContent = e?.code === "invalid_json" ? "Couldn't find anyone in that. Include at least a name." : errCopy(e); }
-  finally{ btn.disabled = !sample; }
 }
 
 // ---------- Find people ----------
@@ -1029,7 +1094,7 @@ function renderEdit(m){
 // ---------- Person card ----------
 let logOpen = false, finishOpen = false;
 function renderPerson(m, e){
-  const ex = e.example;
+  const ex = e.example, first = e.name.split(" ")[0];
   const ds = daysSince(e.last);
   const late = e.cadence > 0 && ds != null && ds >= e.cadence;
   const fuLate = e.followUp && e.followUp <= today();
@@ -1039,17 +1104,17 @@ function renderPerson(m, e){
     ["Company", esc(e.firm)], ["Role", esc(e.role)], ["Industry", esc(e.industry)],
     ["Email", e.email ? `<span>${esc(e.email)}</span>` : ""], ["Phone", esc(e.phone)],
     ["LinkedIn", e.linkedin ? `<a href="${esc(/^https?:/.test(e.linkedin) ? e.linkedin : "https://" + e.linkedin)}" target="_blank" rel="noopener">${esc(e.linkedin.replace(/^https?:\/\/(www\.)?/, ""))}</a>` : ""],
-    ["How you met", esc(e.howMet)],
+    ["How you met", esc([MEET[e.person?.metHow]?.label, e.howMet].filter(Boolean).join(" · "))],
     ["Last contact", e.last ? `<span class="${late?"late":""}">${esc(fmtDate(e.last))} · ${esc(ago(e.last))}</span>` : `<span class="hint">Not logged yet</span>`],
     ["Follow up by", e.followUp ? `<span class="${fuLate?"late":""}">${esc(fmtDate(e.followUp))}${fuLate?" · due":""}</span>` : ""],
     ["Stay in touch", ex ? esc(CADENCES.find(c => c[0]===e.cadence)?.[1]) : `<select id="cadSel" aria-label="Stay in touch">${CADENCES.map(([n,t]) => `<option value="${n}" ${e.cadence===n?"selected":""}>${t}</option>`).join("")}</select>`],
-    ["Snoozed until", snoozed ? `${esc(fmtDate(snoozed))} <button class="btn small" id="unsnooze" style="margin-left:8px">Unsnooze</button>` : ""],
+    ["Not now until", snoozed ? `${esc(fmtDate(snoozed))} <button class="btn small" id="unsnooze" style="margin-left:8px">Undo</button>` : ""],
   ].filter(r => r[1]);
-  // history: logged interactions + conversations, newest first
   const hist = [
     ...e.log.map((x, i) => ({date:x.date, kind:x.kind, note:x.note, logId:x.id, i})),
     ...e.convs.map(c => ({date:c.date, kind:c.kind==="interview" ? "Interview" : "Coffee chat", note:c.debrief?.summary || (c.brief ? "Prepped, not debriefed yet" : "Not prepped yet"), convId:c.id, status:convStatus(c)}))
   ].sort((a,b) => (b.date||"").localeCompare(a.date||"") || (b.i ?? -1) - (a.i ?? -1));
+  const owes = e.owes.length || e.owe.length, rem = e.remember.length || e.personal.length;
   m.innerHTML = `
     <div class="pane-head">${backBtn("Contacts", true)}<span class="spacer"></span>${ex ? `<span class="ex">Example</span>` : `<button class="btn small" id="editTop">Edit</button>`}</div>
     <div class="hero">${avatar(e.name, true)}<h1>${esc(e.name)}</h1>
@@ -1057,64 +1122,58 @@ function renderPerson(m, e){
       ${(e.industry || e.tags.length) ? `<div class="tags">${e.industry ? `<span class="tag ind">${esc(e.industry)}</span>` : ""}${e.tags.map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>` : ""}</div>
     <div class="actions">
       ${act("aMsg","msg", busyDraft.has(e.key) ? "Writing…" : e.draft ? "Rewrite" : "Message", ex || !sample || busyDraft.has(e.key))}
-      ${act("aDone","check","Reached out", ex)}
-      ${act("aLog","log","Log", ex)}
-      ${act("aSnooze","snooze","Snooze", ex)}
+      ${act("aLog","check","Log", ex)}
+      ${act("aSnooze","snooze","Not now", ex)}
       ${act("aPrep","prep","Prep chat", false)}
     </div>
-    ${e.nudge ? `<div class="banner"><b>Follow up</b><ul>${e.nudge.r.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
+    ${e.nudge ? `<div class="banner"><b>Follow up</b><ul>${e.nudge.r.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+      ${e.nudge.cal && !ex ? `<div class="row" style="margin-top:6px"><button class="btn small primary" id="bnCal">${e.nudge.cal.type === "prep" ? "Prep for the meeting" : "Debrief the meeting"}</button><button class="btn small" id="bnCalSkip">Not now</button></div>` : ""}</div>` : ""}
     ${e.missing.length ? `<div class="finish">
       <div><b>Finish this contact</b> <span class="hint">Missing ${esc(e.missing.join(", "))}</span></div>
       <div class="row"><a class="btn small primary" href="${esc(linkedinSearch(e))}" target="_blank" rel="noopener">Find on LinkedIn</a>
         <button class="btn small" id="fillBtn">${finishOpen ? "Close" : "Paste their profile"}</button>
-        <button class="btn small" id="fineBtn">It's fine as is</button></div>
+        <button class="btn small" id="fineBtn">Not now</button></div>
       ${finishOpen ? `<div class="fields">
         <div class="field full"><label class="label" for="fLi">Their LinkedIn link</label><input id="fLi" placeholder="linkedin.com/in/sarahkim" value="${esc(e.linkedin)}"></div>
         <div class="field full"><label class="label" for="fTxt">Their profile text <span class="opt">optional</span></label>
           <textarea id="fTxt" placeholder="On their LinkedIn profile, select all (Ctrl+A or ⌘A), copy, and paste here. Claude fills in their role, company, industry, and background."></textarea></div></div>
         <div class="row"><button class="btn primary small" id="fSave">Save</button><span class="status" id="fSt"></span></div>` : ""}
     </div>` : ""}
-    ${logOpen ? `<div class="section"><h2>Log an interaction</h2>${logFormHTML("pl")}</div>` : ""}
-    ${snoozeOpen ? `<div class="section"><div class="snooze"><span class="label">Remind me in</span>
+    ${logOpen ? `<div class="section"><h2>Log</h2>${logFormHTML("pl")}</div>` : ""}
+    ${snoozeOpen ? `<div class="section"><div class="snooze"><span class="label">Remind me about ${esc(first)} in</span>
       <button class="btn small" data-snz="7">1 week</button><button class="btn small" data-snz="30">1 month</button><button class="btn small" data-snz="90">3 months</button>
       <label class="row" style="gap:6px"><span class="label">or on</span><input type="date" id="snzDate" min="${addDays(1)}" style="width:auto"></label>
       <button class="btn small" id="snzSet">Set</button></div></div>` : ""}
     ${e.draft ? `<div class="section"><div class="draft"><span class="label">${esc(e.draft.channel || "Message")} draft</span>
       <div class="draft-text" id="draftText">${e.draft.subject ? `<b>${esc(e.draft.subject)}</b>\n\n` : ""}${esc(e.draft.message)}</div>
-      <div class="row"><button class="btn small primary" id="copyDraft">Copy</button><span class="hint">Send it from your phone or email, then tap Reached out.</span></div></div></div>` : ""}
+      <div class="row"><button class="btn small primary" id="copyDraft">Copy</button><span class="hint">Send it from your phone or email, then tap Log.</span></div></div></div>` : ""}
+    ${calCardHTML(e)}
     <div class="section"><span class="status" id="pStatus"></span><div class="fieldlist">${rows.map(([l,v]) => `<div class="frow"><span class="fl">${l}</span><span class="fv">${v}</span></div>`).join("")}</div></div>
-    <div class="section"><h2>You owe them</h2>
-      ${(e.owes.length || e.owe.length) ? `<ul class="owelist">${e.owes.map(o => `<li><button class="tick" data-owedone="${esc(o.id)}" ${ex?"disabled":""} aria-label="Mark done"></button><span><span>${esc(o.what)}</span> <span class="${daysSince(o.due) > 0 ? "late" : "hint"}">${esc(dueLabel(o.due))}</span></span>${ex ? "" : `<button class="x" data-owedel="${esc(o.id)}" aria-label="Remove">×</button>`}</li>`).join("")}
-        ${e.owe.map(o => `<li><span class="tick static"></span><span>${esc(o)} <span class="hint">from a chat</span></span><span></span></li>`).join("")}</ul>` : `<p class="hint">Nothing owed right now.</p>`}
-      ${ex ? "" : `<div class="add-line"><input id="oweIn" placeholder="Add a to-do, like “send her my resume”" aria-label="Add a to-do for this person"><input id="oweDue" type="date" aria-label="Due date" style="width:auto"><button class="btn small" id="oweAdd">Add</button></div>`}
-    </div>
-    <div class="section"><h2>Remember</h2>
-      ${(e.remember.length || e.personal.length) ? `<ul class="remember">${e.remember.map((r,i) => `<li><span>${esc(r)}</span>${ex ? "" : `<button class="x" data-rm="${i}" aria-label="Remove">×</button>`}</li>`).join("")}
-        ${e.personal.map(r => `<li><span>${esc(r)}</span><span class="hint">from a chat</span></li>`).join("")}</ul>` : `<p class="hint">Personal details make follow-ups feel natural: family, hobbies, what they're working toward, what they asked you for.</p>`}
-      ${ex ? "" : `<div class="add-line"><input id="remIn" placeholder="Add something to remember, then press Enter" aria-label="Add something to remember"><button class="btn small" id="remAdd">Add</button></div>`}
-    </div>
+    ${owes ? `<div class="section"><h2>You owe ${esc(first)}</h2><ul class="owelist">${e.owes.map(o => `<li><button class="tick" data-owedone="${esc(o.id)}" ${ex?"disabled":""} aria-label="Mark done"></button><span><span>${esc(o.what)}</span> <span class="${daysSince(o.due) > 0 ? "late" : "hint"}">${esc(dueLabel(o.due))}</span></span>${ex ? "" : `<button class="x" data-owedel="${esc(o.id)}" aria-label="Remove">×</button>`}</li>`).join("")}
+        ${e.owe.map(o => `<li><span class="tick static"></span><span>${esc(o)} <span class="hint">from a chat</span></span><span></span></li>`).join("")}</ul></div>` : ""}
+    ${rem ? `<div class="section"><h2>Remember</h2><ul class="remember">${e.remember.map((r,i) => `<li><span>${esc(r)}</span>${ex ? "" : `<button class="x" data-rm="${i}" aria-label="Remove">×</button>`}</li>`).join("")}
+        ${e.personal.map(r => `<li><span>${esc(r)}</span><span class="hint">from a chat</span></li>`).join("")}</ul></div>` : ""}
     ${e.notes ? `<div class="section"><h2>Notes</h2><p class="notes">${esc(e.notes)}</p></div>` : ""}
-    <div class="section"><h2>History</h2>
-      ${hist.length ? `<ol class="timeline">${hist.map(h => `<li>
+    ${ex ? "" : `<div class="section"><div class="add-to">
+      <input id="addIn" placeholder="Add a detail, to-do, or note about ${esc(first)}" aria-label="Add to this card">
+      <div class="row" style="gap:6px"><button class="btn small" data-addas="remember" title="A personal detail to remember">Remember</button><button class="btn small" data-addas="todo" title="Something you owe them">To-do</button><button class="btn small" data-addas="note" title="A note">Note</button></div></div></div>`}
+    ${hist.length ? `<div class="section"><h2>History</h2><ol class="timeline">${hist.map(h => `<li>
         <span class="tl-date">${esc(fmtDate(h.date) || "—")}</span>
         <div class="tl-body">${h.convId ? `<button class="linkish" data-conv="${esc(h.convId)}">${esc(h.kind)}</button> <span class="hint">${esc(h.status)}</span>` : `<b>${esc(h.kind)}</b>`}
           ${h.note ? `<div class="tl-note">${esc(h.note)}</div>` : ""}</div>
-        ${ex ? "<span></span>" : h.logId ? `<button class="x" data-dellog="${esc(h.logId)}" aria-label="Delete this entry">×</button>` : `<button class="x" data-delconv="${esc(h.convId)}" aria-label="Delete this conversation">×</button>`}</li>`).join("")}</ol>`
-      : `<p class="hint">Nothing logged yet. Tap Log after you talk to them.</p>`}
-      ${ex ? "" : `<div class="row"><button class="btn small" id="logBtn2">Log an interaction</button><button class="btn small" id="newCoffee">New coffee chat</button><button class="btn small" id="newInterview">New interview</button></div>`}
-    </div>`;
+        ${ex ? "<span></span>" : h.logId ? `<button class="x" data-dellog="${esc(h.logId)}" aria-label="Delete this entry">×</button>` : `<button class="x" data-delconv="${esc(h.convId)}" aria-label="Delete this conversation">×</button>`}</li>`).join("")}</ol></div>` : ""}`;
   bindBack({type:"home"});
   m.querySelectorAll("[data-conv]").forEach(b => b.onclick = () => openConv(b.dataset.conv));
   if (ex){ $("#aPrep").onclick = () => openConv(e.convs[0]?.id || "example"); return; }
+  bindCalCard(e);
+  const bc = $("#bnCal"); if (bc) bc.onclick = () => openForMeeting(e, e.nudge.cal.it, e.nudge.cal.type === "prep" ? "prep" : "chat");
+  const bs = $("#bnCalSkip"); if (bs) bs.onclick = () => skipCal(e, e.nudge.cal.it, e.nudge.cal.type);
   const status = (t, err) => { const st = $("#pStatus"); if (st){ st.className = err ? "status err" : "status"; st.textContent = t; } };
   $("#editTop").onclick = () => { draftForm = null; go({type:"edit", key:e.key}); };
   $("#aMsg").onclick = () => { if (sample && !busyDraft.has(e.key)) draftFor(e); };
-  $("#aDone").onclick = () => touchPerson(e);
-  $("#aLog").onclick = $("#logBtn2").onclick = () => { logOpen = !logOpen; snoozeOpen = false; renderMain(); if (logOpen) $("#pl-note")?.focus(); };
+  $("#aLog").onclick = () => { logOpen = !logOpen; snoozeOpen = false; renderMain(); if (logOpen) $("#pl-note")?.focus(); };
   $("#aSnooze").onclick = () => { snoozeOpen = !snoozeOpen; logOpen = false; renderMain(); };
   $("#aPrep").onclick = () => newConv(e, "coffee");
-  $("#newCoffee").onclick = () => newConv(e, "coffee");
-  $("#newInterview").onclick = () => newConv(e, "interview");
   if (logOpen) bindLogForm("pl", e, (who, cancelled) => { logOpen = false; render(); if (!cancelled) status("Logged."); });
   const cad = $("#cadSel"); if (cad) cad.onchange = () => { const p = ensurePerson(e); p.cadence = Number(cad.value); persist(p, 0); render(); };
   const un = $("#unsnooze"); if (un) un.onclick = () => { const p = ensurePerson(e); p.snoozeUntil = ""; persist(p, 0); render(); };
@@ -1125,18 +1184,21 @@ function renderPerson(m, e){
     try{ await navigator.clipboard.writeText(txt); cp.textContent = "Copied"; }
     catch{ const r = document.createRange(); r.selectNodeContents($("#draftText")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); cp.textContent = "Selected"; }
   };
-  // owes
   m.querySelectorAll("[data-owedone]").forEach(b => b.onclick = () => { const p = ensurePerson(e); const o = (p.owes||[]).find(x => x.id === b.dataset.owedone); if (o){ o.done = true; o.doneOn = today(); } persist(p, 0); render(); status("Done."); });
   m.querySelectorAll("[data-owedel]").forEach(b => b.onclick = () => { const p = ensurePerson(e); p.owes = (p.owes||[]).filter(x => x.id !== b.dataset.owedel); persist(p, 0); render(); });
-  const oweIn = $("#oweIn");
-  const addTodo = () => { const v = oweIn.value.trim(); if (!v) return; const p = ensurePerson(e); const due = $("#oweDue").value; addOwe(p, v, due ? Math.max(0, -daysSince(due)) : 3, false); persist(p, 0); render(); };
-  $("#oweAdd").onclick = addTodo;
-  oweIn.addEventListener("keydown", ev => { if (ev.key === "Enter"){ ev.preventDefault(); addTodo(); } });
-  // remember list
-  const remIn = $("#remIn");
-  const addRem = () => { const v = remIn.value.trim(); if (!v) return; const p = ensurePerson(e); p.remember = [...(p.remember||[]), v]; persist(p, 0); renderMain(); $("#remIn")?.focus(); };
-  $("#remAdd").onclick = addRem;
-  remIn.addEventListener("keydown", ev => { if (ev.key === "Enter"){ ev.preventDefault(); addRem(); } });
+  // one line to add a detail, a to-do, or a note
+  const addIn = $("#addIn");
+  const addAs = (kind) => {
+    const v = addIn.value.trim(); if (!v){ addIn.focus(); return; }
+    const p = ensurePerson(e);
+    if (kind === "remember") p.remember = [...(p.remember||[]), v];
+    else if (kind === "todo") addOwe(p, v, 3, false);
+    else p.notes = p.notes ? `${p.notes}\n${fmtDate(today())}: ${v}` : `${fmtDate(today())}: ${v}`;
+    persist(p, 0); render(); $("#addIn")?.focus();
+    status(kind === "remember" ? "Added to Remember." : kind === "todo" ? "Added a to-do, due in 3 days." : "Note added.");
+  };
+  m.querySelectorAll("[data-addas]").forEach(b => b.onclick = () => addAs(b.dataset.addas));
+  addIn.addEventListener("keydown", ev => { if (ev.key === "Enter"){ ev.preventDefault(); addAs("note"); } });
   m.querySelectorAll("[data-rm]").forEach(b => b.onclick = () => { const p = ensurePerson(e); p.remember = (p.remember||[]).filter((_, i) => i !== Number(b.dataset.rm)); persist(p, 0); renderMain(); });
   m.querySelectorAll("[data-delconv]").forEach(b => b.onclick = async () => {
     if (!b.dataset.armed){ b.dataset.armed = "1"; b.textContent = "Delete?"; b.classList.add("armed"); return; }
@@ -1144,11 +1206,12 @@ function renderPerson(m, e){
   });
   m.querySelectorAll("[data-dellog]").forEach(b => b.onclick = () => {
     if (!b.dataset.armed){ b.dataset.armed = "1"; b.textContent = "Delete?"; b.classList.add("armed"); return; }
-    const p = ensurePerson(e); p.log = (p.log||[]).filter(x => x.id !== b.dataset.dellog);
+    const p = ensurePerson(e); const gone = (p.log||[]).find(x => x.id === b.dataset.dellog);
+    if (gone?.src) p.ignoreSrc = [...(p.ignoreSrc||[]), gone.src];   // so a deleted email or meeting isn't re-added on the next sync
+    p.log = (p.log||[]).filter(x => x.id !== b.dataset.dellog);
     p.lastContact = (p.log||[]).reduce((mx, x) => x.date > mx ? x.date : mx, "");
     persist(p, 0); render();
   });
-  // finish contact
   const fine = $("#fineBtn"); if (fine) fine.onclick = () => { const p = ensurePerson(e); p.complete = true; persist(p, 0); render(); };
   const fill = $("#fillBtn"); if (fill) fill.onclick = () => { finishOpen = !finishOpen; renderMain(); };
   const fs = $("#fSave"); if (fs) fs.onclick = () => fillFromProfile(e);
@@ -1189,18 +1252,19 @@ function convStatus(c){
   if (c.brief) return "Prepped";
   return "Draft";
 }
-function touchPerson(e){
+function touchPerson(e, quiet){
   const p = ensurePerson(e);
-  addLog(p, {kind:"Reached out"}); resolveAutoOwes(p);
+  addLog(p, {kind:"Message"}); resolveAutoOwes(p);
   e.convs.forEach(c => { if (c.debrief && !c.thankYouSent && !c.example){ c.thankYouSent = true; persist(c, 0); } });
   persist(p, 0); snoozeOpen = false; logOpen = false; render();
-  const st = $("#pStatus"); if (st) st.textContent = "Logged. You're good with " + e.name.split(" ")[0] + " for now.";
+  if (!quiet){ const st = $("#pStatus"); if (st) st.textContent = "Logged. You're good with " + e.name.split(" ")[0] + " for now."; }
 }
 
 function snooze(e, until){
   const p = ensurePerson(e); p.snoozeUntil = until; persist(p, 0); snoozeOpen = false; render();
-  const st = $("#pStatus"); if (st) st.textContent = `Snoozed until ${fmtDate(until)}.`;
+  const st = $("#pStatus"); if (st) st.textContent = `OK. ${e.name.split(" ")[0]} comes back on ${fmtDate(until)}.`;
 }
+
 async function draftFor(e){
   busyDraft.add(e.key); renderMain();
   const recent = e.convs.filter(c => c.debrief).slice(0, 2).map(c => `${c.date}: ${(c.debrief.takeaways||[]).join(" | ")}`).join("\n");
@@ -1272,7 +1336,7 @@ function renderConv(m){
 }
 
 // ---------- About you (the user's own profile) ----------
-let me = null;   // {id:"me", type:"me", name, headline, school, background, goals, story, linkedin}
+let me = null, meDraft = null;   // {id:"me", type:"me", name, headline, school, background, goals, story, linkedin}
 const ME_FIELDS = [
   ["name","Your name","Alex Rivera","input"],
   ["headline","What you do now","Data analyst at a healthcare company","input"],
@@ -1298,7 +1362,8 @@ function saveMe(fields){
 }
 
 function renderMe(m){
-  const d = {...(me||{})};
+  if (!meDraft) meDraft = Object.fromEntries(ME_FIELDS.map(([k]) => [k, me?.[k] || ""]));
+  const d = meDraft;
   m.innerHTML = `<div class="pane-head">${backBtn("Contacts", true)}<span class="spacer"></span><button class="btn small primary" id="meSave">Save</button></div>
     <div class="section"><div style="display:flex;gap:16px;align-items:center">${avatar(d.name || "You", true)}<div><h1>About you</h1>
       <p class="hint">NetWork uses this to write your intro, prep questions, and messages that sound like you. It stays private to you.</p></div></div></div>
@@ -1308,6 +1373,7 @@ function renderMe(m){
     <div class="section"><div class="fields">${ME_FIELDS.map(([k,label,ph,kind]) => `<div class="field ${kind==="textarea"?"full":""}"><label class="label" for="me-${k}">${label}</label>
       ${kind==="textarea" ? `<textarea id="me-${k}" data-mf="${k}" placeholder="${esc(ph)}"></textarea>` : `<input id="me-${k}" data-mf="${k}" placeholder="${esc(ph)}">`}</div>`).join("")}</div>
       <span class="status" id="meSt"></span></div>
+    ${gmailSectionHTML()}${calSectionHTML()}
     <div class="section"><h2>Your data</h2>
       <p class="hint">Download all ${buildNetwork().list.filter(e => !e.example).length} of your contacts, with notes and history, as a spreadsheet (CSV). Good for backups or moving to another app.</p>
       <div class="row"><button class="btn" id="expBtn">Download contacts (CSV)</button><button class="btn" id="impBtn">Import contacts</button><span class="status" id="expSt"></span></div>
@@ -1316,8 +1382,9 @@ function renderMe(m){
   m.querySelectorAll("[data-mf]").forEach(el => { el.value = d[el.dataset.mf] || ""; el.oninput = () => { d[el.dataset.mf] = el.value; }; });
   $("#meSave").onclick = () => {
     if (!(d.name||"").trim()){ const st = $("#meSt"); st.className = "status err"; st.textContent = "Add your name."; $("#me-name").focus(); return; }
-    saveMe(d); render(); const st = $("#meSt"); if (st){ st.className = "status"; st.textContent = "Saved. Prep, drafts, and search now use your profile."; }
+    saveMe(Object.fromEntries(ME_FIELDS.map(([k]) => [k, d[k] || ""]))); meDraft = null; render(); const st = $("#meSt"); if (st){ st.className = "status"; st.textContent = "Saved. Prep, drafts, and search now use your profile."; }
   };
+  bindGmailSection(); bindCalSection();
   $("#impBtn").onclick = () => go({type:"add", mode:"import"});
   $("#expBtn").onclick = async () => {
     const {csv, count} = contactsCSV(), st = $("#expSt");
@@ -1507,6 +1574,560 @@ async function persistMany(docs, progress){
   }
 }
 
+// ---------- Gmail (optional, off until the user connects it) ----------
+// Reads only who you emailed and when (message metadata). Never reads subjects or message content.
+const GMAIL = "Gmail";
+let mcp = null, gmailBusy = false, gmailMsg = "", gmailErrMsg = "", emailSuggest = [];
+const gmailOn = () => !!me?.gmail?.on;
+const cleanEmail = s => { const m = String(s||"").match(/[A-Z0-9._%+'-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i); return m ? m[0].toLowerCase() : ""; };
+const emailsOf = e => String(e.email||"").split(/[,;\s]+/).map(cleanEmail).filter(Boolean);
+const gmailDate = d => { const t = new Date(d); return isNaN(t) ? "" : ymd(t).replace(/-/g, "/"); };
+
+async function initGmail(){
+  if (!window.claude?.use) return;
+  mcp = await window.claude.use("mcp").catch(() => null);
+  refreshGmailUI();
+  if (mcp && gmailOn() && (!me.gmail.lastSync || Date.now() - me.gmail.lastSync > 6 * 3600e3)) syncGmail(false);
+}
+function gmailError(e){
+  switch (e?.code){
+    case "server_not_connected": case "server_not_found": return "Gmail isn't connected to your Claude account. Add it in Claude under Settings → Connectors, then try again.";
+    case "needs_reauth": return "Your Gmail connection expired. Reconnect Gmail in Claude under Settings → Connectors.";
+    case "selection_required": return "You have more than one Gmail account connected. Choose one when Claude asks, then try again.";
+    case "not_in_manifest": case "not_granted": case "consent_required": return "Gmail access wasn't allowed for this page. Press Connect Gmail again to allow it.";
+    case "blocked_by_policy": case "approval_required": return "Your organization doesn't allow this page to use Gmail.";
+    case "server_unavailable": case "rate_limited": return "Gmail didn't respond. Try again in a minute.";
+    default: return "Couldn't reach Gmail. Try again.";
+  }
+}
+function refreshGmailUI(){
+  const typing = document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) && document.activeElement.closest?.("#main");
+  if (!typing && ["me","today","home"].includes(sel.type)) renderMain();
+}
+
+async function connectGmail(){
+  saveMe({gmail:{...(me?.gmail||{}), on:true}});
+  await syncGmail(true);
+  if (gmailErrMsg && !me.gmail.lastSync){ saveMe({gmail:{...me.gmail, on:false}}); refreshGmailUI(); }
+}
+function disconnectGmail(){
+  saveMe({gmail:{...(me?.gmail||{}), on:false}});
+  emailSuggest = []; gmailMsg = "Gmail is off. Emails already logged stay in each contact's history."; gmailErrMsg = "";
+  render();
+}
+
+async function searchGmail(query, pageSize){
+  const res = await mcp.callTool(GMAIL, "search_threads", {query, pageSize, view:"THREAD_VIEW_METADATA_ONLY"}, {cache:false});
+  const pl = res?.payload;
+  return Array.isArray(pl?.threads) ? pl.threads : [];
+}
+
+async function syncGmail(manual){
+  if (!mcp || gmailBusy || !gmailOn()) return;
+  gmailBusy = true; gmailErrMsg = ""; gmailMsg = "Checking your email…"; refreshGmailUI();
+  try{
+    const {list} = buildNetwork();
+    const real = list.filter(e => !e.example && e.person);
+    const byEmail = new Map();
+    for (const e of real) for (const em of emailsOf(e)) byEmail.set(em, e);
+    const myEmails = new Set();
+    const since = gmailDate(me.gmail.lastSync ? me.gmail.lastSync - 2 * 86400e3 : Date.now() - 90 * 86400e3);
+    const touched = new Map(); let sentN = 0, gotN = 0;
+    const emails = [...byEmail.keys()];
+    for (let i = 0; i < emails.length; i += 15){
+      const chunk = emails.slice(i, i + 15);
+      const threads = await searchGmail(`{${chunk.map(x => `from:${x} to:${x} cc:${x}`).join(" ")}} after:${since}`, 50);
+      for (const t of threads) for (const m of (t.messages || [])){
+        const sent = (m.labelIds || []).includes("SENT");
+        if (sent) myEmails.add(cleanEmail(m.sender));
+        const date = m.date ? ymd(new Date(m.date)) : "";
+        if (!date || !m.id) continue;
+        const who = sent ? [...(m.toRecipients||[]), ...(m.ccRecipients||[])].map(cleanEmail) : [cleanEmail(m.sender)];
+        for (const em of new Set(who)){
+          const e = byEmail.get(em); if (!e) continue;
+          const p = e.person, src = "gmail:" + m.id + ":" + (sent ? "out" : "in");
+          p.log = Array.isArray(p.log) ? p.log : [];
+          if (p.log.some(x => x.src === src) || (p.ignoreSrc||[]).includes(src)) continue;
+          if (sent){
+            // reuse a manual "Reached out" / "Email" tap from the same day instead of adding a second entry
+            const same = p.log.find(x => !x.src && x.date === date && (x.kind === "Reached out" || x.kind === "Email" || x.kind === "Message"));
+            if (same){ same.src = src; same.kind = "Email"; same.note = same.note || "Sent from Gmail"; }
+            else p.log.push({id:"l"+uidGen(), date, kind:"Email", note:"Sent from Gmail", src});
+            if (date > (p.lastContact||"")) p.lastContact = date;
+            if (p.followUp && p.followUp <= date) p.followUp = "";
+            (p.owes||[]).forEach(o => { if (!o.done && o.auto && date >= addDays(-1, o.due)){ o.done = true; o.doneOn = date; } });
+            if (p.snoozeUntil && date >= today()) p.snoozeUntil = "";
+            if (p.draft && date >= addDays(-3)) p.draft = null;
+            e.convs.forEach(c => { if (c.debrief && !c.thankYouSent && !c.example && c.date <= date){ c.thankYouSent = true; persist(c, 0); } });
+            sentN++;
+          } else {
+            p.log.push({id:"l"+uidGen(), date, kind:"Email received", note:"They emailed you", src});
+            if (date > (p.lastContact||"")) p.lastContact = date;
+            gotN++;
+          }
+          touched.set(p.id, p);
+        }
+      }
+    }
+    if (touched.size) await persistMany([...touched.values()], null);
+    // Suggest email addresses for contacts who don't have one (only when asked, to keep Gmail calls light)
+    let suggested = 0;
+    if (manual){
+      const missing = real.filter(e => !emailsOf(e).length && !e.person.emailAsked && e.name.trim().split(/\s+/).length >= 2)
+        .sort((a,b) => (b.last||"").localeCompare(a.last||"")).slice(0, 20);
+      const found = [];
+      for (const e of missing){
+        const threads = await searchGmail(`from:"${e.name.replace(/"/g, "")}" newer_than:3y`, 10);
+        const counts = new Map();
+        for (const t of threads) for (const m of (t.messages||[])){
+          if ((m.labelIds||[]).includes("SENT")) continue;
+          const em = cleanEmail(m.sender); if (!em || myEmails.has(em) || byEmail.has(em)) continue;
+          counts.set(em, (counts.get(em)||0) + 1);
+        }
+        const best = [...counts.entries()].sort((a,b) => b[1] - a[1])[0];
+        if (best) found.push({key:e.key, name:e.name, email:best[0], n:best[1]});
+      }
+      emailSuggest = found; suggested = found.length;
+    }
+    saveMe({gmail:{...me.gmail, on:true, lastSync:Date.now()}});
+    const parts = [];
+    if (sentN) parts.push(`${sentN} email${sentN>1?"s":""} you sent`);
+    if (gotN) parts.push(`${gotN} you received`);
+    gmailMsg = (parts.length ? `Logged ${parts.join(" and ")} with ${touched.size} contact${touched.size>1?"s":""}.` : (emails.length ? "No new emails with your contacts." : "None of your contacts have an email address yet, so there was nothing to match."))
+      + (suggested ? ` Found email addresses for ${suggested} contact${suggested>1?"s":""}; review them below.` : "");
+  }catch(e){
+    gmailErrMsg = gmailError(e); gmailMsg = "";
+  }finally{
+    gmailBusy = false; renderSide(); refreshGmailUI();
+  }
+}
+
+function gmailSectionHTML(){
+  if (!window.claude?.use) return `<div class="section"><h2>Email</h2><p class="hint">Automatic email logging is available in the Claude version of NetWork, where you can connect your own Gmail.</p></div>`;
+  if (!mcp) return "";
+  const on = gmailOn(), last = me?.gmail?.lastSync;
+  return `<div class="section" id="gmailSec"><h2>Email</h2>
+    <div class="connect ${on ? "on" : ""}">
+      <div class="connect-top"><span class="connect-name">Gmail</span><span class="pill-state ${on ? "ok" : ""}">${on ? "On" : "Off"}</span></div>
+      <p class="hint">${on
+        ? `When you email a contact, NetWork logs it, updates when you last talked, and clears follow-ups you owed. ${last ? `Last checked ${esc(ago(ymd(new Date(last))))}.` : ""}`
+        : `Turn this on and NetWork logs emails with your contacts automatically, updates when you last talked, and clears follow-ups once you've emailed someone.`}
+        NetWork only looks at who you emailed and when, never subjects or message content.</p>
+      <div class="row">${on
+        ? `<button class="btn small primary" id="gmSync" ${gmailBusy?"disabled":""}>${gmailBusy ? "Checking…" : "Check now"}</button><button class="btn small" id="gmOff">Turn off</button>`
+        : `<button class="btn small primary" id="gmOn" ${gmailBusy?"disabled":""}>${gmailBusy ? "Connecting…" : "Connect Gmail"}</button>`}</div>
+      ${gmailErrMsg ? `<p class="status err">${esc(gmailErrMsg)}</p>` : gmailMsg ? `<p class="status">${esc(gmailMsg)}</p>` : ""}
+    </div>
+    ${emailSuggest.length ? `<div class="suggest"><b>Email addresses found in your inbox</b><p class="hint">Confirm each one. Matching is by name, so it can be wrong.</p>
+      ${emailSuggest.map((s,i) => `<div class="sug-row">${avatar(s.name)}<span style="min-width:0"><span class="cname">${esc(s.name)}</span><br><span class="csub">${esc(s.email)}</span></span>
+        <span class="row" style="gap:6px"><button class="btn small primary" data-sugok="${i}">Add</button><button class="btn small" data-sugno="${i}">Not them</button></span></div>`).join("")}</div>` : ""}
+  </div>`;
+}
+function bindGmailSection(){
+  const on = $("#gmOn"); if (on) on.onclick = connectGmail;
+  const sy = $("#gmSync"); if (sy) sy.onclick = () => syncGmail(true);
+  const off = $("#gmOff"); if (off) off.onclick = disconnectGmail;
+  document.querySelectorAll("[data-sugok]").forEach(b => b.onclick = () => {
+    const s = emailSuggest[Number(b.dataset.sugok)]; const e = findEntry(s.key);
+    if (e){ const p = ensurePerson(e); p.email = s.email; persist(p, 0); }
+    emailSuggest = emailSuggest.filter(x => x !== s);
+    gmailMsg = `Added ${s.email}. Press Check now to log past emails with ${s.name.split(" ")[0]}.`; renderMain();
+  });
+  document.querySelectorAll("[data-sugno]").forEach(b => b.onclick = () => {
+    const s = emailSuggest[Number(b.dataset.sugno)]; const e = findEntry(s.key);
+    if (e){ const p = ensurePerson(e); p.emailAsked = true; persist(p, 0); }
+    emailSuggest = emailSuggest.filter(x => x !== s); renderMain();
+  });
+}
+// Small prompt on Today, shown once a profile exists, until connected or dismissed
+function gmailTodayHTML(){
+  if (!mcp || !hasMe() || gmailOn() || me?.gmailHintOff) return "";
+  return `<div class="setup"><div><b>Let NetWork see who you email</b><p class="hint">Connect Gmail and emails with your contacts are logged for you, so “last contact” stays accurate without tapping anything. It only looks at who and when, never what you wrote.</p></div>
+    <div class="row" style="gap:6px"><button class="btn primary small" id="tdGm">Connect Gmail</button><button class="btn small" id="tdGmNo">No thanks</button></div></div>`;
+}
+function bindGmailToday(){
+  const a = $("#tdGm"); if (a) a.onclick = () => { go({type:"me"}); connectGmail(); };
+  const b = $("#tdGmNo"); if (b) b.onclick = () => { saveMe({gmailHintOff:true}); renderMain(); };
+}
+
+// ---------- Google Calendar (optional, off until the user connects it) ----------
+// Finds meetings with people in your contacts: reminds you to prep before and debrief after, and logs past meetings.
+const GCAL = "Google Calendar";
+let calBusy = false, calMsg = "", calErrMsg = "", calEvents = [];
+let calByKey = new Map();          // contact key -> {upcoming:[], past:[]}
+const calOn = () => !!me?.calendar?.on;
+const calError = e => gmailError(e).replace(/Gmail/g, "Google Calendar");
+const localStamp = d => `${ymd(d)}T00:00:00`;
+const evStart = ev => new Date(ev.start?.dateTime || "");
+const evEnd = ev => new Date(ev.end?.dateTime || ev.start?.dateTime || "");
+const fmtWhen = d => {
+  const day = ymd(d), t = d.toLocaleTimeString(undefined, {hour:"numeric", minute:"2-digit"});
+  if (day === today()) return `Today at ${t}`;
+  if (day === addDays(1)) return `Tomorrow at ${t}`;
+  if (day === addDays(-1)) return `Yesterday at ${t}`;
+  return d.toLocaleDateString(undefined, {weekday:"short", month:"short", day:"numeric"}) + ` at ${t}`;
+};
+
+async function initCal(){
+  if (!mcp) return;
+  refreshGmailUI();
+  if (calOn()) syncCal(false);
+}
+async function connectCal(){
+  saveMe({calendar:{...(me?.calendar||{}), on:true}});
+  await syncCal(true);
+  if (calErrMsg && !me.calendar.lastSync){ saveMe({calendar:{...me.calendar, on:false}}); refreshGmailUI(); }
+}
+function disconnectCal(){
+  saveMe({calendar:{...(me?.calendar||{}), on:false}});
+  calEvents = []; calByKey = new Map(); calErrMsg = "";
+  calMsg = "Calendar is off. Meetings already logged stay in each contact's history.";
+  render();
+}
+
+// Which contact is this meeting with? Attendee email first, then their full name in the event title.
+function matchEvent(ev, real, byEmail){
+  const people = [...(ev.attendees||[]), ev.organizer || {}].filter(a => a && !a.self && a.email);
+  for (const a of people){ const e = byEmail.get(cleanEmail(a.email)); if (e) return {e, how:"email"}; }
+  const title = (ev.summary || "").toLowerCase();
+  if (!title) return null;
+  for (const e of real){
+    const n = e.name.trim().toLowerCase();
+    if (n.split(/\s+/).length >= 2 && new RegExp("\\b" + n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b").test(title)) return {e, how:"name"};
+  }
+  return null;
+}
+
+async function syncCal(manual){
+  if (!mcp || calBusy || !calOn()) return;
+  calBusy = true; calErrMsg = ""; calMsg = "Checking your calendar…"; refreshGmailUI();
+  try{
+    const now = new Date();
+    const from = new Date(now); from.setDate(from.getDate() - 7);
+    const to = new Date(now); to.setDate(to.getDate() + 8);
+    const events = []; let pageToken = "", pages = 0;
+    do {
+      const res = await mcp.callTool(GCAL, "list_events", {startTime:localStamp(from), endTime:localStamp(to), orderBy:"startTime", pageSize:250, ...(pageToken ? {pageToken} : {})}, {cache:false});
+      const pl = res?.payload || {};
+      events.push(...(Array.isArray(pl.events) ? pl.events : []));
+      pageToken = pl.nextPageToken || ""; pages++;
+    } while (pageToken && pages < 3);
+
+    const {list} = buildNetwork();
+    const real = list.filter(e => !e.example);
+    const byEmail = new Map();
+    for (const e of real) for (const em of emailsOf(e)) byEmail.set(em, e);
+    const found = []; const touched = new Map(); let logged = 0;
+    for (const ev of events){
+      if (ev.status === "cancelled" || !ev.start?.dateTime) continue;          // skip cancelled and all-day events
+      if ((ev.attendees||[]).length > 8) continue;                              // skip classes, webinars, big meetings
+      const mine = (ev.attendees||[]).find(a => a.self);
+      if (mine?.responseStatus === "declined") continue;
+      const m = matchEvent(ev, real, byEmail); if (!m) continue;
+      const start = evStart(ev), end = evEnd(ev);
+      if (isNaN(start)) continue;
+      const item = {id:ev.id, key:m.e.key, name:m.e.name, title:ev.summary || "Meeting", start:start.getTime(), end:end.getTime(), link:ev.htmlLink || "", how:m.how};
+      found.push(item);
+      // Log meetings that have already happened
+      if (end < now && m.e.person){
+        const p = m.e.person, src = "cal:" + ev.id;
+        p.log = Array.isArray(p.log) ? p.log : [];
+        if (!p.log.some(x => x.src === src) && !(p.ignoreSrc||[]).includes(src)){
+          const date = ymd(start);
+          p.log.push({id:"l"+uidGen(), date, kind:"Meeting", note:`${item.title} (from your calendar)`, src});
+          if (date > (p.lastContact||"")) p.lastContact = date;
+          touched.set(p.id, p); logged++;
+        }
+      }
+    }
+    if (touched.size) await persistMany([...touched.values()], null);
+    calEvents = found; indexCal();
+    saveMe({calendar:{...me.calendar, on:true, lastSync:Date.now()}});
+    const up = found.filter(x => x.start > Date.now()).length;
+    calMsg = found.length
+      ? `Found ${up} upcoming meeting${up===1?"":"s"} with your contacts${logged ? ` and logged ${logged} past one${logged===1?"":"s"}` : ""}.`
+      : "No meetings with your contacts in the past week or the next week.";
+  }catch(e){
+    calErrMsg = calError(e); calMsg = "";
+  }finally{
+    calBusy = false; render();
+  }
+}
+function indexCal(){
+  calByKey = new Map();
+  const now = Date.now();
+  for (const it of calEvents){
+    if (!calByKey.has(it.key)) calByKey.set(it.key, {upcoming:[], past:[]});
+    (it.start > now ? calByKey.get(it.key).upcoming : calByKey.get(it.key).past).push(it);
+  }
+}
+
+// Prep / debrief reminders for one contact, used by the to-do list
+function calReasonsFor(e){
+  const c = calByKey.get(e.key); if (!c || !calOn()) return [];
+  const seen = e.person?.calSeen || {};
+  const out = [], now = Date.now();
+  const convOn = d => e.convs.find(x => x.date === d && !x.example);
+  for (const it of c.upcoming){
+    if (it.start - now > 36 * 3600e3 || seen[it.id + ":prep"]) continue;
+    const cv = convOn(ymd(new Date(it.start)));
+    if (cv?.brief) continue;
+    out.push({type:"prep", it, text:`Meeting ${fmtWhen(new Date(it.start)).replace(/^./, s => s.toLowerCase())}: prep for it`, score:4.5});
+  }
+  for (const it of c.past){
+    if (now - it.end > 3 * 86400e3 || seen[it.id + ":debrief"]) continue;
+    const d = ymd(new Date(it.start)), cv = convOn(d);
+    if (cv?.debrief) continue;
+    if (e.log.some(x => x.date >= d && !String(x.src||"").startsWith("cal:") && ["Email","Reached out","Text"].includes(x.kind))) continue;
+    out.push({type:"debrief", it, text:`You met ${fmtWhen(new Date(it.start)).replace(/ at .*/, "").toLowerCase()}: debrief and send a thank-you`, score:4});
+  }
+  return out;
+}
+// Open (or create) the coffee chat for a calendar meeting
+function openForMeeting(e, it, tab){
+  const d = ymd(new Date(it.start));
+  let c = e.convs.find(x => x.date === d && !x.example);
+  if (!c){
+    newConv(e, "coffee");
+    c = chats[chats.length - 1];
+    c.date = d; c.calEventId = it.id; c.notes = [c.notes, `Calendar: ${it.title}`].filter(Boolean).join("\n");
+  }
+  c.tab = tab; persist(c, 0); openConv(c.id);
+}
+function skipCal(e, it, type){
+  const p = ensurePerson(e);
+  p.calSeen = {...(p.calSeen||{}), [it.id + ":" + type]:true};
+  persist(p, 0); render();
+}
+
+function calSectionHTML(){
+  if (!window.claude?.use || !mcp) return "";
+  const on = calOn(), last = me?.calendar?.lastSync;
+  return `<div class="section" id="calSec"><h2>Calendar</h2>
+    <div class="connect ${on ? "on" : ""}">
+      <div class="connect-top"><span class="connect-name">Google Calendar</span><span class="pill-state ${on ? "ok" : ""}">${on ? "On" : "Off"}</span></div>
+      <p class="hint">${on
+        ? `NetWork spots meetings with your contacts, reminds you to prep the day before and to debrief afterward, and logs meetings in their history. ${last ? `Last checked ${esc(ago(ymd(new Date(last))))}.` : ""}`
+        : `Turn this on and NetWork spots meetings with people in your contacts, reminds you to prep the day before and to debrief afterward, and logs the meeting in their history.`}
+        It only looks at events in the past week and the next week, and never changes your calendar.</p>
+      <div class="row">${on
+        ? `<button class="btn small primary" id="calSync" ${calBusy?"disabled":""}>${calBusy ? "Checking…" : "Check now"}</button><button class="btn small" id="calOff">Turn off</button>`
+        : `<button class="btn small primary" id="calOnBtn" ${calBusy?"disabled":""}>${calBusy ? "Connecting…" : "Connect Google Calendar"}</button>`}</div>
+      ${calErrMsg ? `<p class="status err">${esc(calErrMsg)}</p>` : calMsg ? `<p class="status">${esc(calMsg)}</p>` : ""}
+    </div></div>`;
+}
+function bindCalSection(){
+  const a = $("#calOnBtn"); if (a) a.onclick = connectCal;
+  const b = $("#calSync"); if (b) b.onclick = () => syncCal(true);
+  const c = $("#calOff"); if (c) c.onclick = disconnectCal;
+}
+// Upcoming meetings on Today
+function calTodayHTML(){
+  if (!calOn() || !calEvents.length) return "";
+  const {list} = buildNetwork();
+  const up = calEvents.filter(x => x.start > Date.now()).sort((a,b) => a.start - b.start).slice(0, 5);
+  if (!up.length) return "";
+  return `<div class="section"><h2>Coming up</h2><div class="todo-group">${up.map(it => {
+    const e = list.find(x => x.key === it.key); if (!e) return "";
+    const cv = e.convs.find(x => x.date === ymd(new Date(it.start)) && !x.example);
+    return `<div class="todo"><button class="todo-main" data-open="${esc(e.key)}">${avatar(e.name)}<span style="min-width:0"><span class="cname">${esc(e.name)}</span> <span class="csub">${esc(e.firm)}</span><br><span class="hint">${esc(fmtWhen(new Date(it.start)))} · ${esc(it.title)}</span></span></button>
+      <div class="todo-acts"><button class="btn small ${cv?.brief ? "" : "primary"}" data-calprep="${esc(it.id)}">${cv?.brief ? "Prepped" : "Prep"}</button></div></div>`; }).join("")}</div></div>`;
+}
+function bindCalToday(){
+  const {list} = buildNetwork();
+  document.querySelectorAll("[data-calprep]").forEach(b => b.onclick = () => {
+    const it = calEvents.find(x => x.id === b.dataset.calprep); const e = it && list.find(x => x.key === it.key);
+    if (e) openForMeeting(e, it, "prep");
+  });
+}
+function calTodayHintHTML(){
+  if (!mcp || !hasMe() || calOn() || me?.calHintOff || (!gmailOn() && !me?.gmailHintOff)) return "";
+  return `<div class="setup"><div><b>Get reminders before and after meetings</b><p class="hint">Connect Google Calendar and NetWork reminds you to prep the day before a meeting with a contact and to debrief afterward. It never changes your calendar.</p></div>
+    <div class="row" style="gap:6px"><button class="btn primary small" id="tdCal">Connect Google Calendar</button><button class="btn small" id="tdCalNo">No thanks</button></div></div>`;
+}
+function bindCalHint(){
+  const a = $("#tdCal"); if (a) a.onclick = () => { go({type:"me"}); connectCal(); };
+  const b = $("#tdCalNo"); if (b) b.onclick = () => { saveMe({calHintOff:true}); renderMain(); };
+}
+// Meetings on a contact's card
+function calCardHTML(e){
+  const c = calByKey.get(e.key); if (!c || !calOn()) return "";
+  const up = [...c.upcoming].sort((a,b) => a.start - b.start);
+  if (!up.length) return "";
+  return `<div class="section"><h2>Upcoming meetings</h2>${up.map(it => `<div class="meet-row"><span><b>${esc(fmtWhen(new Date(it.start)))}</b><br><span class="hint">${esc(it.title)}</span></span>
+    <span class="row" style="gap:6px"><button class="btn small primary" data-mprep="${esc(it.id)}">Prep</button>${it.link ? `<a class="btn small" href="${esc(it.link)}" target="_blank" rel="noopener">Open in Calendar</a>` : ""}</span></div>`).join("")}</div>`;
+}
+function bindCalCard(e){
+  document.querySelectorAll("[data-mprep]").forEach(b => b.onclick = () => { const it = calEvents.find(x => x.id === b.dataset.mprep); if (it) openForMeeting(e, it, "prep"); });
+}
+
+// ---------- Group email: one message, personalized for each person ----------
+let grp = null;   // {keys:[], subject, body, personal, lines:{}, edits:{}, busy, msg, err, confirm, results:{}}
+const GROUP_DEFAULT = "Hi {first name},\n\n\n\nBest,\n" ;
+function grpState(){
+  if (!grp) grp = {keys:[], subject:"", body:"", personal:false, lines:{}, edits:{}, busy:false, msg:"", err:"", confirm:false, results:{}, q:""};
+  if (!grp.body) grp.body = GROUP_DEFAULT + (meFirst() || "");
+  return grp;
+}
+function groupOptions(list){
+  const m = new Map();
+  const add = (k, label, e) => { if (!m.has(k)) m.set(k, {label, keys:[]}); m.get(k).keys.push(e.key); };
+  for (const e of list){
+    if (e.example) continue;
+    e.tags.forEach(t => add("tag:" + t, `Tag: ${t}`, e));
+    if (e.firm) add("co:" + e.firm, `Company: ${e.firm}`, e);
+    if (e.industry) add("ind:" + e.industry, `Industry: ${e.industry}`, e);
+    if (e.howMet) add("met:" + e.howMet, `Met at: ${e.howMet}`, e);
+  }
+  return [...m.entries()].sort((a,b) => b[1].keys.length - a[1].keys.length || a[1].label.localeCompare(b[1].label));
+}
+function personalize(e, g){
+  if (g.edits[e.key] != null) return g.edits[e.key];
+  let body = g.body;
+  if (g.personal && !body.includes("{personal line}")){
+    const i = body.indexOf("\n");
+    body = i < 0 ? body + "\n\n{personal line}" : body.slice(0, i) + "\n\n{personal line}" + body.slice(i);
+  }
+  const line = g.personal ? (g.lines[e.key] || "") : "";
+  const first = e.name.trim().split(/\s+/)[0];
+  return body
+    .replace(/\{first name\}/gi, first).replace(/\{name\}/gi, e.name).replace(/\{company\}/gi, e.firm || "your company")
+    .replace(/\n*\{personal line\}\n*/gi, line ? `\n\n${line}\n\n` : "\n\n")
+    .replace(/\n{3,}/g, "\n\n").trim();
+}
+const fillSubject = (e, g) => g.subject.replace(/\{first name\}/gi, e.name.split(/\s+/)[0]).replace(/\{company\}/gi, e.firm || "");
+
+function renderGroup(m){
+  const g = grpState();
+  const {list} = buildNetwork();
+  const real = list.filter(e => !e.example);
+  if (sel.preset){ const opt = groupOptions(list).find(([k]) => k === sel.preset); if (opt) g.keys = [...new Set([...g.keys, ...opt[1].keys])]; sel = {type:"group"}; }
+  const chosen = g.keys.map(k => real.find(e => e.key === k)).filter(Boolean);
+  const noEmail = chosen.filter(e => !emailsOf(e).length);
+  const q = g.q.trim().toLowerCase();
+  const matches = q ? real.filter(e => !g.keys.includes(e.key) && (e.name + " " + e.firm).toLowerCase().includes(q)).slice(0, 6) : [];
+  const canDraft = mcp && gmailOn();
+  const withEmail = chosen.filter(e => emailsOf(e).length);
+  m.innerHTML = `<div class="pane-head">${backBtn("Contacts", true)}<span class="spacer"></span></div>
+    <div class="section"><h1>Group email</h1><p class="hint">Write one email and NetWork personalizes it for each person: their name, their company, and if you like, one personal line based on what you know about them.</p></div>
+    <div class="section"><h2>1. Who</h2>
+      ${real.length ? `<div class="row">
+        <select class="input" id="grpPick" aria-label="Add a group" style="max-width:340px"><option value="">Add a group…</option>${groupOptions(list).map(([k,v]) => `<option value="${esc(k)}">${esc(v.label)} (${v.keys.length})</option>`).join("")}</select>
+        <input id="grpQ" placeholder="Add a person by name" style="max-width:260px" autocomplete="off"></div>
+      ${matches.length ? `<div class="chips">${matches.map(e => `<button type="button" class="chip" data-gadd="${esc(e.key)}">+ ${esc(e.name)}</button>`).join("")}</div>` : ""}
+      ${chosen.length ? `<div class="chips">${chosen.map(e => `<span class="chip on">${esc(e.name)}${emailsOf(e).length ? "" : " · no email"}<button class="x" data-grm="${esc(e.key)}" aria-label="Remove ${esc(e.name)}">×</button></span>`).join("")}</div>
+        <p class="hint">${chosen.length} ${chosen.length===1?"person":"people"}${noEmail.length ? `. ${noEmail.length} ${noEmail.length===1?"has":"have"} no email address saved; you can still copy their message.` : "."} <button class="linkish" id="grpClear">Clear</button></p>` : `<p class="hint">Pick a group (everyone with a tag, at a company, or from the same event) or add people one by one.</p>`}`
+      : `<p class="hint">Add some contacts first.</p>`}
+    </div>
+    <div class="section"><h2>2. Message</h2>
+      <div class="field"><label class="label" for="grpSubj">Subject</label><input id="grpSubj" placeholder="Great meeting you at the alumni night"></div>
+      <div class="field"><label class="label" for="grpBody">Email</label><textarea id="grpBody" class="tall"></textarea></div>
+      <div class="row"><span class="hint">Insert:</span><button class="btn small" data-ins="{first name}">First name</button><button class="btn small" data-ins="{company}">Company</button></div>
+      <label class="row" style="gap:8px"><input type="checkbox" id="grpPers" ${g.personal ? "checked" : ""} ${sample ? "" : "disabled"} style="width:18px;height:18px;accent-color:var(--accent)"> Add one personal line for each person, written from what you know about them</label>
+      ${g.personal ? `<div class="row"><button class="btn small" id="grpWrite" ${g.busy || !chosen.length ? "disabled" : ""}>${g.busy ? "Writing…" : Object.keys(g.lines).length ? "Rewrite personal lines" : "Write personal lines"}</button><span class="hint">You can edit any of them below.</span></div>` : ""}
+    </div>
+    ${chosen.length ? `<div class="section"><h2>3. Check and send</h2>
+      <div class="previews">${chosen.map(e => `<details class="pv" ${g.edits[e.key] != null ? "open" : ""}><summary><span class="cname">${esc(e.name)}</span> <span class="csub">${esc(emailsOf(e)[0] || "no email saved")}</span>${g.personal && !g.lines[e.key] ? ` <span class="hint">· no personal line</span>` : ""}${g.results[e.key]?.url ? ` <a href="${esc(g.results[e.key].url)}" target="_blank" rel="noopener" class="tagnote">Draft ready</a>` : g.results[e.key]?.err ? ` <span class="late">· ${esc(g.results[e.key].err)}</span>` : ""}</summary>
+        <textarea class="tall" data-gedit="${esc(e.key)}" aria-label="Email to ${esc(e.name)}"></textarea>
+        <div class="row"><button class="btn small" data-gcopy="${esc(e.key)}">Copy</button>${g.edits[e.key] != null ? `<button class="btn small" data-greset="${esc(e.key)}">Undo my edits</button>` : ""}</div></details>`).join("")}</div>
+      <div class="row send-row">
+        ${canDraft ? (g.confirm
+          ? `<button class="btn primary" id="grpDraftGo" ${g.busy ? "disabled" : ""}>Yes, create ${withEmail.length} drafts</button><button class="btn" id="grpDraftNo">Cancel</button><span class="hint">Drafts go to your Gmail Drafts folder. Nothing is sent.</span>`
+          : `<button class="btn primary" id="grpDraft" ${!withEmail.length || g.busy ? "disabled" : ""}>${g.busy ? "Creating drafts…" : `Create ${withEmail.length} Gmail draft${withEmail.length===1?"":"s"}`}</button>`) : ""}
+        <button class="btn ${canDraft ? "" : "primary"}" id="grpCopyAll">Copy all</button>
+        <button class="btn" id="grpCopyTo">Copy addresses</button>
+        <button class="btn" id="grpLog">Log as sent</button>
+      </div>
+      ${!canDraft && mcp ? `<p class="hint">Connect Gmail under About you and NetWork can put a ready-to-send draft for each person in your Gmail.</p>` : ""}
+      ${g.err ? `<p class="status err">${esc(g.err)}</p>` : g.msg ? `<p class="status">${esc(g.msg)}</p>` : ""}
+      <div id="grpFallback"></div>
+    </div>` : ""}`;
+  bindBack({type:"home"});
+  const subj = $("#grpSubj"), body = $("#grpBody");
+  subj.value = g.subject; body.value = g.body;
+  const refreshPreviews = () => document.querySelectorAll("[data-gedit]").forEach(t => { if (g.edits[t.dataset.gedit] == null){ const e = real.find(x => x.key === t.dataset.gedit); if (e) t.value = personalize(e, g); } });
+  subj.oninput = () => { g.subject = subj.value; };
+  body.oninput = () => { g.body = body.value; refreshPreviews(); };
+  document.querySelectorAll("[data-gedit]").forEach(t => { const e = real.find(x => x.key === t.dataset.gedit); t.value = personalize(e, g); t.oninput = () => { g.edits[e.key] = t.value; }; });
+  m.querySelectorAll("[data-ins]").forEach(b => b.onclick = () => {
+    const s = body.selectionStart ?? body.value.length;
+    body.value = body.value.slice(0, s) + b.dataset.ins + body.value.slice(body.selectionEnd ?? s);
+    g.body = body.value; refreshPreviews(); body.focus(); body.selectionStart = body.selectionEnd = s + b.dataset.ins.length;
+  });
+  const pick = $("#grpPick"); if (pick) pick.onchange = () => { const opt = groupOptions(list).find(([k]) => k === pick.value); if (opt){ g.keys = [...new Set([...g.keys, ...opt[1].keys])]; g.msg = ""; renderMain(); } };
+  const gq = $("#grpQ"); if (gq){ gq.value = g.q; gq.oninput = () => { g.q = gq.value; renderMain(); const n = $("#grpQ"); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }; }
+  m.querySelectorAll("[data-gadd]").forEach(b => b.onclick = () => { g.keys.push(b.dataset.gadd); g.q = ""; renderMain(); });
+  m.querySelectorAll("[data-grm]").forEach(b => b.onclick = () => { g.keys = g.keys.filter(k => k !== b.dataset.grm); renderMain(); });
+  const cl = $("#grpClear"); if (cl) cl.onclick = () => { g.keys = []; g.results = {}; g.confirm = false; renderMain(); };
+  const pers = $("#grpPers"); if (pers) pers.onchange = () => { g.personal = pers.checked; renderMain(); if (g.personal && !Object.keys(g.lines).length && chosen.length) writeGroupLines(); };
+  const wr = $("#grpWrite"); if (wr) wr.onclick = writeGroupLines;
+  m.querySelectorAll("[data-greset]").forEach(b => b.onclick = () => { delete g.edits[b.dataset.greset]; renderMain(); });
+  const copy = async (text, btn) => { try{ await navigator.clipboard.writeText(text); btn.textContent = "Copied"; return true; }catch{ return false; } };
+  const fallback = text => { $("#grpFallback").innerHTML = `<p class="hint">Copying isn't allowed here. Select the text below and copy it.</p><textarea class="tall" readonly id="grpFbText"></textarea>`; $("#grpFbText").value = text; $("#grpFbText").select(); };
+  m.querySelectorAll("[data-gcopy]").forEach(b => b.onclick = async () => { const e = real.find(x => x.key === b.dataset.gcopy); const t = (g.subject ? `Subject: ${fillSubject(e, g)}\n\n` : "") + personalize(e, g); if (!await copy(t, b)) fallback(t); });
+  const ca = $("#grpCopyAll"); if (ca) ca.onclick = async () => { const t = chosen.map(e => `To: ${e.name}${emailsOf(e)[0] ? " <" + emailsOf(e)[0] + ">" : ""}\n${g.subject ? `Subject: ${fillSubject(e, g)}\n` : ""}\n${personalize(e, g)}`).join("\n\n----------\n\n"); if (!await copy(t, ca)) fallback(t); };
+  const ct = $("#grpCopyTo"); if (ct) ct.onclick = async () => { const t = withEmail.map(e => emailsOf(e)[0]).join(", "); if (!t){ g.msg = "None of these people have an email address saved."; renderMain(); return; } if (!await copy(t, ct)) fallback(t); };
+  const lg = $("#grpLog"); if (lg) lg.onclick = () => {
+    if (!lg.dataset.armed){ lg.dataset.armed = "1"; lg.textContent = `Log ${chosen.length} as sent?`; return; }
+    const ps = chosen.map(e => { const p = ensurePerson(e); addLog(p, {kind:"Email", note: g.subject ? `Group email: ${g.subject}` : "Group email"}); resolveAutoOwes(p); return p; });
+    persistMany(ps, null).then(() => { g.msg = `Logged the email for ${ps.length} ${ps.length===1?"person":"people"}.`; render(); });
+  };
+  const dr = $("#grpDraft"); if (dr) dr.onclick = () => { g.confirm = true; renderMain(); };
+  const dn = $("#grpDraftNo"); if (dn) dn.onclick = () => { g.confirm = false; renderMain(); };
+  const dg = $("#grpDraftGo"); if (dg) dg.onclick = () => createGroupDrafts(withEmail);
+}
+
+async function writeGroupLines(){
+  const g = grpState(); if (!sample || g.busy) return;
+  const {list} = buildNetwork();
+  const chosen = g.keys.map(k => list.find(e => e.key === k)).filter(Boolean);
+  if (!chosen.length) return;
+  g.busy = true; g.err = ""; g.msg = "Writing a personal line for each person…"; renderMain();
+  try{
+    for (let i = 0; i < chosen.length; i += 25){
+      const batch = chosen.slice(i, i + 25);
+      const r = await sample.json(`For each person below, write ONE short sentence (under 25 words) the user can add to this group email so it feels personal. Base it only on the details given: what they talked about, personal details, how they met. If there's nothing useful to go on, return "" for that person rather than something generic. Sound natural and warm, in the user's voice, with no flattery and no "I hope this finds you well".
+
+${meText()}
+
+THE EMAIL:
+Subject: ${g.subject || "(none)"}
+${g.body}
+
+PEOPLE (key=... identifies each):
+${batch.map(e => [`key=${e.key}`, e.name, e.role, e.firm, e.howMet && "met: " + e.howMet, e.notes && "notes: " + e.notes.replace(/\s+/g, " ").slice(0, 300), (e.remember.length || e.personal.length) && "remember: " + [...e.remember, ...e.personal].join("; "), e.log.slice(-2).map(x => x.note).filter(Boolean).join("; ")].filter(Boolean).join(" | ")).join("\n")}
+
+Reply with only JSON: {"lines": [{"key": "", "line": ""}]}`, {cache:false});
+      for (const x of (r?.lines || [])) if (x?.key && typeof x.line === "string") g.lines[x.key] = x.line.trim();
+    }
+    const n = chosen.filter(e => g.lines[e.key]).length;
+    g.msg = `Wrote personal lines for ${n} of ${chosen.length}.${n < chosen.length ? " The rest didn't have enough saved about them; add a detail to their card for a better line." : ""}`;
+  }catch(e){ g.err = errCopy(e); g.msg = ""; }
+  finally{ g.busy = false; if (sel.type === "group") renderMain(); }
+}
+
+async function createGroupDrafts(people){
+  const g = grpState(); if (!mcp || g.busy) return;
+  g.busy = true; g.confirm = false; g.err = ""; g.msg = `Creating drafts: 0 of ${people.length}…`; renderMain();
+  let ok = 0, failed = 0;
+  for (const e of people){
+    if (g.results[e.key]?.url){ ok++; continue; }        // already created; don't make duplicates
+    try{
+      const res = await mcp.callTool(GMAIL, "create_draft", {to:[emailsOf(e)[0]], subject:fillSubject(e, g), body:personalize(e, g)});
+      const pl = res?.payload || {};
+      g.results[e.key] = {url: pl.viewUrl || "https://mail.google.com/mail/#drafts"}; ok++;
+    }catch(err){
+      g.results[e.key] = {err: err?.code === "not_in_manifest" ? "Gmail drafts weren't allowed" : "draft not created"}; failed++;
+      if (["not_in_manifest","server_not_connected","needs_reauth","blocked_by_policy"].includes(err?.code)){ g.err = gmailError(err); break; }
+    }
+    g.msg = `Creating drafts: ${ok + failed} of ${people.length}…`;
+    if (sel.type === "group") renderMain();
+  }
+  g.busy = false;
+  if (!g.err) g.msg = failed ? `Created ${ok} drafts. ${failed} didn't work; press Create again to retry just those.` : `Created ${ok} draft${ok===1?"":"s"} in your Gmail Drafts folder. Review and send them from Gmail; nothing was sent.`;
+  if (sel.type === "group") renderMain();
+}
+
 function bindField(c, id, key, after){
   const el = document.getElementById(id);
   if (!el) return;
@@ -1547,7 +2168,7 @@ function renderPrep(c, pane){
   renderBrief(c);
   const btn = $("#prepBtn");
   if (c.example){ btn.disabled = true; $("#prepStatus").textContent = "This is an example. Start a new chat to prep your own."; return; }
-  if (!sample){ btn.disabled = true; $("#prepStatus").textContent = "Prep needs Claude, which isn't available in this view."; }
+  if (!sample){ btn.disabled = true; $("#prepStatus").textContent = "Prep needs AI, which isn't available on this copy. Use the Claude version, or run your own copy with an API key (see the README)."; }
   btn.onclick = () => runPrep(c);
 }
 
@@ -1711,7 +2332,7 @@ function renderDebrief(c, pane){
     <div class="out" id="debOut"></div>`;
   if (!c.example){
     const btn = $("#debBtn");
-    if (!sample){ btn.disabled = true; $("#debStatus").textContent = "Debrief needs Claude, which isn't available in this view."; }
+    if (!sample){ btn.disabled = true; $("#debStatus").textContent = "Debrief needs AI, which isn't available on this copy. Use the Claude version, or run your own copy with an API key (see the README)."; }
     btn.onclick = () => runDebrief(c);
   }
   drawDebrief(c);
@@ -1814,6 +2435,19 @@ function parseLoose(t){
   if (a >= 0 && b > a){ try{ return JSON.parse(t.slice(a, b+1)); }catch{} }
   throw {code:"invalid_json", text:t};
 }
+// Shrinks a photo before upload so it sends quickly and fits the server's size limit
+async function photoToBase64(file, max = 1600){
+  let blob = file;
+  try{
+    const bmp = await createImageBitmap(file);
+    const k = Math.min(1, max / Math.max(bmp.width, bmp.height));
+    const c = document.createElement("canvas"); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+    c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+    blob = await new Promise(r => c.toBlob(r, "image/jpeg", 0.85)) || file;
+  }catch{}
+  const data = await new Promise((ok, bad) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1]); r.onerror = bad; r.readAsDataURL(blob); });
+  return {media_type: blob.type && blob.type.startsWith("image/") ? blob.type : "image/jpeg", data};
+}
 function makeServerSample(){
   async function call(prompt, opts = {}, retried = false){
     let code = null; try{ code = localStorage.getItem("nw-access"); }catch{}
@@ -1821,7 +2455,7 @@ function makeServerSample(){
     try{
       res = await fetch("api/claude", {method:"POST",
         headers:{"content-type":"application/json", ...(code ? {"x-access-code":code} : {})},
-        body:JSON.stringify({prompt, tier:opts.modelTier || "default"})});
+        body:JSON.stringify({prompt, tier:opts.modelTier || "default", images: opts._images || undefined})});
     }catch{ throw {code:"upstream_error"}; }
     if (res.status === 401){
       if (!retried){
@@ -1837,8 +2471,10 @@ function makeServerSample(){
     if (!j.text) throw {code:"empty_completion"};
     return {text:j.text, truncated:!!j.truncated};
   }
-  const s = (p, o) => call(p, o);
-  s.json = async (p, o) => { const {text} = await call(p + "\n\nReply with only the JSON value and no other text.", o); return parseLoose(text); };
+  const withImages = async (o = {}) => o.images ? {...o, _images: await Promise.all([].concat(o.images instanceof FileList ? [...o.images] : o.images).slice(0, 4).map(f => photoToBase64(f)))} : o;
+  const s = async (p, o) => call(p, await withImages(o));
+  s.json = async (p, o) => { const {text} = await call(p + "\n\nReply with only the JSON value and no other text.", await withImages(o)); return parseLoose(text); };
+  s.limits = async () => ({maxPromptBytes: 200000, images: {maxCount: 4, maxInputBytes: 20 * 1024 * 1024, mediaTypes: ["image/jpeg","image/png","image/webp","image/gif"]}});
   return s;
 }
 
@@ -1849,14 +2485,18 @@ window.addEventListener("resize", () => { const was = document.body.dataset.pane
   const cl = window.claude;
   if (!cl?.use){
     // Running on its own (GitHub / Vercel / local): AI goes through this site's /api/claude, data stays in this browser
-    useLocal = true; if (location.protocol.startsWith("http")) sample = makeServerSample();
-    splitDocs(lsRead()); render(); return;
+    useLocal = true; splitDocs(lsRead()); render();
+    // Only turn on AI if this site has the /api/claude server (GitHub Pages doesn't)
+    if (location.protocol.startsWith("http")){
+      try{ const r = await fetch("api/claude", {method:"GET"}); if (r.status !== 404) { sample = makeServerSample(); render(); } }catch{}
+    }
+    return;
   }
   const [u, d, s] = await Promise.all([cl.use("user"), cl.use("db"), cl.use("sample")]);
   sample = s;
   uid = u ? await u.id() : null;
   db = d;
-  if (!db || !uid){ useLocal = true; splitDocs(lsRead()); render(); return; }
+  if (!db || !uid){ useLocal = true; splitDocs(lsRead()); render(); initGmail().then(initCal); return; }
   let first = true;
   db.collection("data/users/"+uid).onSnapshot(snap => {
     const incoming = snap.docs.map(x => ({...x.data(), id:x.id}));
@@ -1865,7 +2505,7 @@ window.addEventListener("resize", () => { const was = document.body.dataset.pane
     const merged = incoming.map(c => (timers[c.id] && local.has(c.id)) ? local.get(c.id) : c);
     for (const [id, c] of local) if (!merged.find(x => x.id === id) && timers[id]) merged.push(c);
     splitDocs(merged);
-    if (first){ first = false; render(); return; }
+    if (first){ first = false; render(); initGmail().then(initCal); return; }
     renderSide();
     const typing = document.activeElement && document.activeElement.closest?.("#main") && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
     if (!typing && !pending.length && sel.type !== "edit" && sel.type !== "conv") renderMain();

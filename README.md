@@ -8,9 +8,9 @@ Built as Build #1 for an MBA course on designing useful AI solutions. It's desig
 
 ![Today: a short to-do list of who to follow up with, and a quick way to add someone you just met](docs/screenshots/today.png)
 
-| A contact card | Coffee chat debrief | On a phone |
+| A contact card | Group email | On a phone |
 |---|---|---|
-| ![Contact card with actions, follow-up reasons, and details](docs/screenshots/contact.png) | ![Debrief with summary and a ready-to-send thank-you note](docs/screenshots/debrief.png) | ![Contact card on a phone](docs/screenshots/phone-contact.png) |
+| ![Contact card with actions, follow-up reasons, and details](docs/screenshots/contact.png) | ![Group email, personalized for each person](docs/screenshots/group-email.png) | ![Contact card on a phone](docs/screenshots/phone-contact.png) |
 
 *Screenshots use made-up sample contacts.*
 
@@ -24,7 +24,7 @@ Built as Build #1 for an MBA course on designing useful AI solutions. It's desig
 | **What does the system need to know?** | Who you met, where and how, what they said, what you promised them, when you last talked, and how often you want to stay in touch with them. |
 | **What should it produce?** | Contact cards from a spoken or typed note; a short "Reach out" list with the reason for each person; a drafted message; and for coffee chats and interviews, prep questions, a debrief, a scorecard, and a thank-you note. |
 | **How would we know it's good?** | Users reach out more often than before. Parsed contacts are accurate. Drafted messages get sent with few edits. Nobody feels nagged. |
-| **What feedback would improve it?** | Corrections to parsed contacts, edits to drafts, snoozes (a nudge that came too early), and "I reached out" taps (a nudge that worked). |
+| **What feedback would improve it?** | Corrections to parsed contacts, edits to drafts, snoozes (a nudge that came too early), and "Log" taps (a nudge that worked). |
 
 ## Current workflow vs. NetWork
 
@@ -32,7 +32,7 @@ Built as Build #1 for an MBA course on designing useful AI solutions. It's desig
 |---|---|---|
 | Meet someone | Maybe save a LinkedIn connection; details live in your head | Say "Met Sarah Kim, PM at Google, follow up next week" and a card is created |
 | Remember to follow up | Rely on memory; usually forget | Shows up in "Reach out" when it's due, at most three at a time |
-| Know what to say | Stare at a blank message, then put it off | Tap "Draft a message" and get a short, specific note you can edit and send |
+| Know what to say | Stare at a blank message, then put it off | Tap "Message" and get a short, specific note you can edit and send |
 | Coffee chat or interview | Prep from scratch, take scattered notes, write the thank-you later (or never) | Prep questions from their background, a checklist during the call, a debrief and thank-you after |
 | Find someone later | Scroll LinkedIn and try to remember | Group by company, industry, how you met, tag, or last contact, and search everything |
 
@@ -41,15 +41,21 @@ Built as Build #1 for an MBA course on designing useful AI solutions. It's desig
 **About you**
 - A short profile (name, what you do, school, background, goals, and your 30-second story). Paste your LinkedIn profile or resume and it fills itself in. Prep, drafted messages, and search all use it, so the app works for any user, not a built-in persona.
 
+**Email and calendar (optional, off until you connect them)**
+- Connect Gmail and NetWork logs emails with your contacts automatically: "last contact" stays accurate, and follow-ups you owed are cleared once you've emailed someone. It looks only at who you emailed and when, never subjects or message content. It's off until you connect it, and you can turn it off anytime. It can also find email addresses for contacts who don't have one, for you to confirm. Available in the Claude version, which uses your own connected Gmail.
+- Connect Google Calendar and NetWork spots meetings with your contacts (by their email, or their name in the event title). It reminds you to prep the day before, reminds you to debrief afterward, and logs the meeting in their history. It only reads the past week and the next week, skips big meetings and declined invites, and never changes your calendar.
+
 **Network**
 - **Follow-up rules based on how you met.** Meet someone in person and you get a reminder to send a nice-to-meet-you email the next day; after a video call, a thank-you note; after an intro, a reply to the intro. Online-only connections owe nothing. Logging an email or text clears the reminder. You can also add your own to-dos to anyone.
 - **Find people.** Ask in plain English ("who do I know in fintech?", "alumni from my school at Bain SF"). It searches your contacts' companies, notes, history, and personal details, suggests who could introduce you, and writes LinkedIn and Google searches for finding new people.
-- **Capture by voice or text.** Describe one person or a whole event's worth ("At the tech night I met Sarah... then Tom from Bain..."). Each person becomes a card you can check before saving. You can also add or edit anyone by hand.
+- **One box to add people.** Type a name and it saves instantly. Type or dictate a sentence ("At the tech night I met Sarah... then Tom from Bain...") and the AI fills in each person for you to confirm. Mention someone already in your contacts ("had coffee with Jen, she's moving to NYC") and it logs the conversation instead.
+- **Add people from a photo.** Snap a sign-up sheet, attendee list, business card, or name tags and everyone on it is added. For groups larger than five, follow-up reminders stay off so your to-do list doesn't flood.
+- **Group email.** Write one email to a group (everyone from an event, a company, or a tag). NetWork fills in each person's name and company, and can add one personal line per person from what you know about them. Copy each one, or, with Gmail connected, create a ready-to-send draft for each person. Nothing is ever sent automatically.
 - **Import your existing network.** Upload LinkedIn's Connections.csv, or a Google, iPhone, or Outlook contacts export, or any spreadsheet with a Name column. Duplicates merge instead of doubling up, and imported contacts don't send reminders until you turn them on, so a 500-person import doesn't flood your to-do list.
 - **Download everything.** One tap exports all contacts, notes, and history as a CSV, for backup or moving to another tool.
 - **Organize any way.** Group by company, industry, how you met, your own tags, or how recently you talked. Search names, notes, and tags.
 - **Reach out, without the pile-up.** Ranks who needs you (things you owe them, follow-up dates, people going quiet) and shows three at a time. Each person has their own stay-in-touch frequency, from monthly to never.
-- **Snooze** anyone for a week, a month, three months, or until a date you choose.
+- **Two actions everywhere: Log and Not now.** Log records that you talked; Not now pushes a reminder back a week, a month, three months, or to a date you choose.
 - **Drafted messages** that open with something specific to the person and never say "just checking in."
 
 **Conversations (coffee chats and interviews)**
@@ -61,20 +67,17 @@ Built as Build #1 for an MBA course on designing useful AI solutions. It's desig
 
 NetWork works like a contacts app: your contacts on the left, the selected person's card on the right (one screen at a time on a phone).
 
-1. **Add people.** Tap **+** and pick how:
-   - **Just met someone:** name and where you met, one tap to save. "Where" stays filled in, so you can add a whole event quickly.
-   - **Describe them:** type or dictate a sentence about one or more people; AI fills in the details for you to confirm.
-   - **Log a conversation:** pick someone already in your contacts and note what you talked about.
-   - **Full details:** every field, with the less common ones under "More details".
-   - **Import contacts:** upload LinkedIn's Connections.csv (Settings & Privacy → Data privacy → Get a copy of your data → Connections) or any contacts spreadsheet.
+1. **Add people.** In "Who did you meet?" (on Today, or under **+**), type a name, describe people in a sentence, or tap **Photo** for a sign-up sheet or business card. Pick how you met (in person, video call, introduced, or online) and optionally where. "Fill in every field" and "Import contacts" are links underneath.
 2. **Open Today** for your to-do list: **Follow up** (people to contact) and **Finish contact** (cards missing a company, role, or LinkedIn). **Find on LinkedIn** opens a pre-filled LinkedIn search; paste their profile link and text into the card and Claude fills in the details.
 3. **Keep cards current.** Tap **Log** after any interaction (coffee, call, text, event) to build their history; last contact updates automatically. Add personal details under **Remember**; drafted messages use them.
-4. **Follow up.** On a contact's card, tap **Message** for a drafted note, send it from your phone or email, then tap **Reached out**. Not now? **Snooze**.
+4. **Follow up.** On a contact's card, tap **Message** for a drafted note, send it from your phone or email, then tap **Log**. Not ready? Tap **Not now**. To write to many people at once, use **Group email** on Today, or **Email group** next to a group in the contact list.
 5. **Before a coffee chat or interview,** tap **Prep chat** on the person's card.
 6. **After the call,** upload the transcript and run the debrief. Send the thank-you and tick **I sent it**.
 7. **Find anyone** with search, the **Reach out** filter, or the group menu (A–Z, company, industry, how you met, tag, last contact).
 
 ## Run it
+
+**Try it now:** the GitHub Pages link for this repo opens the app with no setup. Adding, logging, to-dos, import, and export all work there; the AI features (describe someone, drafts, prep, debrief, smart search) need either the Claude-hosted version or your own copy with an API key, below.
 
 You need [Node.js](https://nodejs.org) 18 or newer and an [Anthropic API key](https://console.anthropic.com).
 

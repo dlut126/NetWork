@@ -1,4 +1,4 @@
-// POST /api/claude  { prompt: string, tier?: "default" | "quick" | "complex" }  ->  { text, truncated }
+// POST /api/claude  { prompt: string, tier?: "default" | "quick" | "complex", images?: [{media_type, data}] }  ->  { text, truncated }
 // Holds the Anthropic API key on the server so it never reaches the browser or the repo.
 // Works as a Vercel serverless function and is reused by server.js for local runs.
 
@@ -8,6 +8,8 @@ const MODELS = {
   complex: process.env.CLAUDE_MODEL || "claude-sonnet-5-5",
 };
 const MAX_PROMPT_CHARS = 200_000;
+const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const MAX_IMAGES = 4, MAX_IMAGE_B64 = 4_000_000;   // about 3 MB per photo after the browser shrinks it
 
 async function readBody(req) {
   if (req.body && typeof req.body === "object") return req.body;
@@ -39,6 +41,16 @@ export default async function handler(req, res) {
   if (!prompt.trim()) return send(res, 400, { error: "Missing prompt" });
   if (prompt.length > MAX_PROMPT_CHARS) return send(res, 413, { error: "Prompt too long" });
 
+  const images = Array.isArray(body.images) ? body.images : [];
+  if (images.length > MAX_IMAGES) return send(res, 413, { error: "Too many images" });
+  for (const im of images) {
+    if (!im || !IMAGE_TYPES.has(im.media_type) || typeof im.data !== "string") return send(res, 400, { error: "Unsupported image" });
+    if (im.data.length > MAX_IMAGE_B64) return send(res, 413, { error: "Image too large" });
+  }
+  const content = images.length
+    ? [...images.map(im => ({ type: "image", source: { type: "base64", media_type: im.media_type, data: im.data } })), { type: "text", text: prompt }]
+    : prompt;
+
   try {
     const r = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -50,7 +62,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: MODELS[body.tier] || MODELS.default,
         max_tokens: 4000,
-        messages: [{ role: "user", content: prompt }],
+        messages: [{ role: "user", content }],
       }),
     });
     if (r.status === 429) return send(res, 429, { error: "Rate limited" });
