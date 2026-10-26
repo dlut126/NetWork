@@ -26,6 +26,7 @@ function send(res, status, obj) {
 }
 
 export default async function handler(req, res) {
+  if (req.method === "GET") return send(res, 200, { ok: true });   // the app checks this to know the AI is available
   if (req.method !== "POST") return send(res, 405, { error: "Use POST" });
 
   // ANTHROPIC_API_KEY is the standard name; "anthro" is accepted because Vercel won't rename a sensitive variable once saved.

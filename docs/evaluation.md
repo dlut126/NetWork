@@ -126,7 +126,7 @@ People usually keep contacts in Excel, with their own column names. We built 7 t
 - move placeholders to notes
 - handle ordinal dates and strip tracking codes
 
-Result: **1,080 of 1,080 fields** match the sheet, and the 5 test files still pass.
+Result: **1,080 of 1,080 fields** match the sheet, and all 7 test files still pass.
 
 **Safeguards.** Before importing, the preview shows how each column was read ("Firm → Company") so the person can catch a wrong match. When the AI maps the columns, the preview says so. And if the AI picks a "name" column full of dates or numbers, the import is refused (tested by giving it a deliberately wrong mapping). Reminders for imported people stay off unless the person turns them on, but follow-up dates from the sheet still show up on Today.
 
