@@ -6,7 +6,7 @@
 
 Most people don't lose touch because they don't care. They lose touch because reaching out takes three things at once: remembering *when*, having a *reason*, and finding the *words*. NetWork handles all three. You tell it who you met, in your own words or by voice, and it keeps a lifelong map of your network, tells you who to reach out to (a few people at a time, never a flood), and drafts the message.
 
-Built as Build #1 for an MBA course on designing useful AI solutions. It's designed for anyone, not one person: each user sets up a short profile, and every AI feature works from it.
+Built for an MBA course on designing useful AI solutions (final build). It's designed for anyone, not one person: each user sets up a short profile, and every AI feature works from it.
 
 ![Today: a short to-do list of who to follow up with, and a quick way to add someone you just met](docs/screenshots/today.png)
 
@@ -25,8 +25,8 @@ Built as Build #1 for an MBA course on designing useful AI solutions. It's desig
 | **What are we trying to improve?** | Staying in touch. For people who find networking draining, follow-ups slip, thank-you notes go unsent, and relationships quietly go cold. |
 | **What does the system need to know?** | Who you met, where and how, what they said, what you promised them, when you last talked, and how often you want to stay in touch with them. |
 | **What should it produce?** | Contact cards from a spoken or typed note; a short "Reach out" list with the reason for each person; a drafted message; and for coffee chats and interviews, prep questions, a debrief, a scorecard, and a thank-you note. |
-| **How would we know it's good?** | Users reach out more often than before. Parsed contacts are accurate. Drafted messages get sent with few edits. Nobody feels nagged. |
-| **What feedback would improve it?** | Corrections to parsed contacts, edits to drafts, snoozes (a nudge that came too early), and "Log" taps (a nudge that worked). |
+| **How would we know it's good?** | Users reach out more often than before. Adding someone never creates a wrong contact (measured: 1 of 25 on a held-out set, down from 13; see [evaluation](docs/evaluation.md)). Drafted messages get sent with few edits. Nobody feels nagged. |
+| **What feedback would improve it?** | Undo taps and corrections to parsed contacts (the router got it wrong), edits to drafts (how far the AI was from sendable), "Not now" taps (a nudge that came too early), and "Log" taps (a nudge that worked). |
 
 ## Current workflow vs. NetWork
 
