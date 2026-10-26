@@ -51,7 +51,7 @@ Built for an MBA course on designing useful AI solutions (final build). It's des
 - **Follow-up rules based on how you met.** Meet someone in person and you get a reminder to send a nice-to-meet-you email the next day; after a video call, a thank-you note; after an intro, a reply to the intro. Online-only connections owe nothing. Logging an email or text clears the reminder. You can also add your own to-dos to anyone.
 - **Get an intro.** Type who you want to meet ("someone at Stripe", "product managers in fintech") on Today. It instantly shows who you already know there and who could introduce you (same industry, worked there before, or your notes say they know people), then the AI refines it. Tap **Ask for an intro** and it drafts the request with a short blurb they can forward. Tap **I sent it** and it logs the ask and reminds you to follow up in a week. Works without the AI too (instant matches and a starter template).
 - **One box to add people.** Type a name and it saves instantly. Type or dictate a sentence ("At the tech night I met Sarah... then Tom from Bain...") and the AI fills in each person for you to confirm. Mention someone already in your contacts ("had coffee with Jen, she's moving to NYC") and it logs the conversation instead.
-- **Add people from a photo.** Snap a sign-up sheet, attendee list, business card, or name tags and everyone on it is added. For groups larger than five, follow-up reminders stay off so your to-do list doesn't flood.
+- **Add people from a photo.** Snap a sign-up sheet, attendee list, business card, or name tags and everyone on it is added. For groups larger than five, follow-up reminders stay off so your to-do list doesn't flood. Anything the AI isn't sure it read correctly is marked **Hard to read** so you check it against the photo before saving.
 - **Group email.** Write one email to a group (everyone from an event, a company, or a tag). NetWork fills in each person's name and company, and can add one personal line per person from what you know about them. Copy each one, or, with Gmail connected, create a ready-to-send draft for each person. Nothing is ever sent automatically.
 - **Import your existing network.** Upload LinkedIn's Connections.csv, or a Google, iPhone, or Outlook contacts export, or any spreadsheet with a Name column. Duplicates merge instead of doubling up, and imported contacts don't send reminders until you turn them on, so a 500-person import doesn't flood your to-do list.
 - **Download everything.** One tap exports all contacts, notes, and history as a CSV, for backup or moving to another tool.
@@ -152,7 +152,7 @@ flowchart TD
 | Decision | Who makes it | Safeguard |
 |---|---|---|
 | Is this text a name or a description? | Rules ([evaluated](docs/evaluation.md)) | Ambiguous inputs go to the AI; **Undo** after instant saves |
-| Who's in this sentence or photo, and what do we know? | AI | **Human reviews every card** before saving; unreadable photo rows are skipped, not guessed |
+| Who's in this sentence or photo, and what do we know? | AI | **Human reviews every card** before saving; unreadable photo rows are skipped, not guessed; uncertain fields are flagged **Hard to read** ([tested](docs/evaluation.md#evaluation-2-reading-sign-up-sheet-photos)) |
 | Is this the same person as an existing contact? | AI + exact name match | Card says "Already in contacts"; person chooses Log it or Discard |
 | Who should I follow up with, and when? | Rules (how you met, promises, cadence, meetings) | Max 3 at a time; **Not now** on everything; per-person "stay in touch" setting |
 | What should the message say? | AI | **Person edits and sends**; the app never sends |
@@ -162,7 +162,14 @@ flowchart TD
 
 ## Evaluation
 
-See [docs/evaluation.md](docs/evaluation.md) for the full results. In short: the original rules for "is this just a name?" created **13 wrong contacts out of 25 descriptions** on a held-out test set. The shipped version creates **1** (95% routed correctly), and **Undo** covers the remaining case.
+See [docs/evaluation.md](docs/evaluation.md) for full results, test data, and scripts. In short:
+
+- **Typing a name vs. a description.** On held-out test inputs, the original rules created **13 wrong contacts out of 25 descriptions**. The shipped version creates **1** (95% routed correctly), and **Undo** covers the remaining case.
+- **Reading sign-up sheet photos.** 10 synthetic sign-up sheet photos, 83 people, with answer keys, run through the live app. It found **all 83 people with every name exactly right** (accents included) and 97–99% of emails exact. It made up no fields and added no crossed-out rows. On deliberately terrible photos it mostly skips rather than guesses, but it made 6 confident misreads. After we added **"Hard to read" flags**, all of them (and both misses on the normal sheets) are highlighted on the review card before saving.
+
+| The 10 test photos | What you see when something is hard to read |
+|---|---|
+| ![All 10 test photos](docs/screenshots/photo-test-sheets.jpg) | ![Review cards with Hard to read flags shown first](docs/screenshots/photo-hard-to-read.png) |
 
 ## What's next
 

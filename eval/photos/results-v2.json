@@ -1,0 +1,563 @@
+[
+{
+"id": 1,
+"seconds": 4.4,
+"err": null,
+"out": {
+"unreadable": 0,
+"people": [
+{
+"name": "Hannah Brooks",
+"firm": "Notion",
+"email": "hbrooks@gmail.com"
+},
+{
+"name": "Omar Siddiqui",
+"firm": "Amazon",
+"email": "omar.siddiqui@anderson.ucla.edu"
+},
+{
+"name": "Grace Liu",
+"firm": "Stripe",
+"email": "grace.liu@stripe.com"
+},
+{
+"name": "Diego Ramirez",
+"firm": "Deloitte",
+"email": "dramirez@outlook.com"
+},
+{
+"name": "Priya Nair",
+"firm": "Salesforce",
+"email": "priya.nair@salesforce.com"
+},
+{
+"name": "Ben Carter",
+"firm": "Meta",
+"email": "bcarter@meta.com"
+},
+{
+"name": "Lauren Kim",
+"firm": "Figma",
+"email": "lauren.kim@gmail.com"
+},
+{
+"name": "Marcus Hill",
+"firm": "Adobe",
+"email": "mhill@adobe.com"
+}
+]
+}
+},
+{
+"id": 2,
+"seconds": 4.6,
+"err": null,
+"out": {
+"unreadable": 0,
+"people": [
+{
+"name": "Ethan Walsh",
+"firm": "Bain",
+"email": "ethanwalsh@gmail.com"
+},
+{
+"name": "Sofia Rossi",
+"firm": "BCG",
+"email": "srossi@bcg.com"
+},
+{
+"name": "Kevin Tran",
+"firm": "McKinsey",
+"email": "ktran@mckinsey.com"
+},
+{
+"name": "Maya Patel",
+"firm": "EY-Parthenon",
+"email": "maya.p@ey.com"
+},
+{
+"name": "Jordan Lee",
+"firm": "Accenture",
+"email": "jordanlee22@yahoo.com"
+},
+{
+"name": "Rachel Adams",
+"firm": "Kearney",
+"email": "radams@kearney.com"
+},
+{
+"name": "Tom Becker",
+"firm": "Oliver Wyman",
+"email": "tbecker@oliverwyman.com"
+},
+{
+"name": "Nina Shah",
+"firm": "L.E.K.",
+"email": "nshah@lek.com"
+}
+]
+}
+},
+{
+"id": 3,
+"seconds": 8.6,
+"err": null,
+"out": {
+"unreadable": 0,
+"people": [
+{
+"name": "Alex Morgan",
+"firm": "Google",
+"email": "amorgan@google.com"
+},
+{
+"name": "Chloe Bennett",
+"firm": "Airbnb",
+"email": "chloe.b@airbnb.com"
+},
+{
+"name": "Raj Malhotra",
+"firm": "Nvidia",
+"email": "rmalhotra@nvidia.com"
+},
+{
+"name": "Emily Zhang",
+"firm": "Microsoft",
+"email": "emzhang@microsoft.com"
+},
+{
+"name": "Sam O'Connor",
+"firm": "Uber",
+"email": "soconnor@uber.com"
+},
+{
+"name": "Isabel Cruz",
+"firm": "Apple",
+"email": "icruz@apple.com"
+},
+{
+"name": "Derek Johnson",
+"firm": "Snowflake",
+"email": "derekjohnson@snowflake.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Fatima Ali",
+"firm": "Datadog",
+"email": "fali@datadoghq.com"
+},
+{
+"name": "Liam Murphy",
+"firm": "LinkedIn",
+"email": "lmurphy@linkedin.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Zoe Park",
+"firm": "Pinterest",
+"email": "zpark@pinterest.com"
+}
+]
+}
+},
+{
+"id": 4,
+"seconds": 8.6,
+"err": null,
+"out": {
+"unreadable": 0,
+"people": [
+{
+"name": "Victoria Hayes",
+"firm": "Kaiser Permanente",
+"email": "vhayes@kp.org"
+},
+{
+"name": "Andre Wilson",
+"firm": "",
+"email": "andrew.wilson88@gmail.com",
+"unsure": [
+"name",
+"email"
+]
+},
+{
+"name": "Mei Chen",
+"firm": "Genentech",
+"email": ""
+},
+{
+"name": "Carlos Mendez",
+"firm": "",
+"email": ""
+},
+{
+"name": "Hope",
+"firm": "",
+"email": "",
+"unsure": [
+"name"
+]
+},
+{
+"name": "Daniel Osei",
+"firm": "Johnson & Johnson",
+"email": "dosei@itsjnj.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Laura Fischer",
+"firm": "Medtronic",
+"email": ""
+}
+]
+}
+},
+{
+"id": 5,
+"seconds": 4.9,
+"err": null,
+"out": {
+"unreadable": 1,
+"people": [
+{
+"name": "Jasmine Reed",
+"firm": "Netflix",
+"email": "jreed@netflix.com"
+},
+{
+"name": "Tyler Grant",
+"firm": "Disney",
+"email": "tgrant@disney.com"
+},
+{
+"name": "Olivia Martinez",
+"firm": "Warner Bros. Discovery",
+"email": "omartinez@wbd.com"
+},
+{
+"name": "Noah Kim",
+"firm": "Spotify",
+"email": "noah.kim@spotify.com"
+},
+{
+"name": "Ava Thompson",
+"firm": "Paramount",
+"email": "ava.thompson@paramount.com"
+}
+]
+}
+},
+{
+"id": 6,
+"seconds": 3.6,
+"err": null,
+"out": {
+"unreadable": 0,
+"people": [
+{
+"name": "Brandon Scott",
+"firm": "CBRE",
+"email": "bscott@cbre.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Hailey Nguyen",
+"firm": "JLL",
+"email": "hnguyen@jll.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Marco Bianchi",
+"firm": "Blackstone",
+"email": "mbianchi@blackstone.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Tiffany Wu",
+"firm": "Prologis",
+"email": "twu@prologis.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Josh Feldman",
+"firm": "Related",
+"email": "jfeldman@related.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Kayla Brown",
+"firm": "Hines",
+"email": "kbrown@hines.com",
+"unsure": [
+"email"
+]
+}
+]
+}
+},
+{
+"id": 7,
+"seconds": 4.3,
+"err": null,
+"out": {
+"unreadable": 0,
+"people": [
+{
+"name": "Elena Petrova",
+"firm": "Ramp",
+"email": "",
+"phone": "(415) 555-0142",
+"linkedin": "linkedin.com/in/elenapetrova"
+},
+{
+"name": "Chris Doyle",
+"firm": "Plaid",
+"email": "",
+"phone": "650-555-0187",
+"linkedin": "linkedin.com/in/chrisdoyle"
+},
+{
+"name": "Aisha Bello",
+"firm": "Chime",
+"email": "",
+"phone": "(213) 555-0119"
+},
+{
+"name": "Ryan Cho",
+"firm": "Brex",
+"email": "",
+"linkedin": "linkedin.com/in/ryancho"
+},
+{
+"name": "Megan Foster",
+"firm": "Robinhood",
+"email": "",
+"phone": "310-555-0166",
+"linkedin": "linkedin.com/in/meganfoster"
+}
+]
+}
+},
+{
+"id": 8,
+"seconds": 12.9,
+"err": null,
+"out": {
+"unreadable": 0,
+"people": [
+{
+"name": "Abigail Turner",
+"firm": "Goldman Sachs",
+"email": "aturner@gmail.com"
+},
+{
+"name": "Brianna Lopez",
+"firm": "J.P. Morgan",
+"email": "blopez@jpmorgan.com"
+},
+{
+"name": "Camila Reyes",
+"firm": "PwC",
+"email": "creyes@pwc.com"
+},
+{
+"name": "Dana Whitfield",
+"firm": "KPMG",
+"email": "dwhitfield@kpmg.com"
+},
+{
+"name": "Erin O'Neill",
+"firm": "Nike",
+"email": "eoneill@nike.com"
+},
+{
+"name": "Fiona Grant",
+"firm": "L'Oréal",
+"email": "fgrant@loreal.com"
+},
+{
+"name": "Gabriela Santos",
+"firm": "P&G",
+"email": "gsantos@pg.com",
+"unsure": [
+"firm",
+"email"
+]
+},
+{
+"name": "Heather Lin",
+"firm": "Visa",
+"email": "hlin@visa.com"
+},
+{
+"name": "Ivy Chen",
+"firm": "",
+"email": "ivy.chen@gmail.com"
+},
+{
+"name": "Julia Novak",
+"firm": "Tesla",
+"email": "jnovak@tesla.com"
+},
+{
+"name": "Kara Mitchell",
+"firm": "Hulu",
+"email": "kmitchell@hulu.com"
+},
+{
+"name": "Leah Goldberg",
+"firm": "Bain",
+"email": "lgoldberg@bain.com"
+},
+{
+"name": "Monica Alvarez",
+"firm": "Target",
+"email": "malvarez@target.com"
+},
+{
+"name": "Natalie Brooks",
+"firm": "IBM",
+"email": "nbrooks@ibm.com"
+},
+{
+"name": "Paige Ellis",
+"firm": "Intuit",
+"email": "pellis@intuit.com"
+},
+{
+"name": "Quinn Harper",
+"firm": "",
+"email": "qharper@yahoo.com"
+},
+{
+"name": "Riley Evans",
+"firm": "Oracle",
+"email": "revans@oracle.com"
+},
+{
+"name": "Sara Haddad",
+"firm": "Cisco",
+"email": "shaddad@cisco.com"
+},
+{
+"name": "Tessa Morgan",
+"firm": "Lyft",
+"email": "tmorgan@lyft.com"
+},
+{
+"name": "Uma Krishnan",
+"firm": "Deloitte",
+"email": "ukrishnan@deloitte.com"
+}
+]
+}
+},
+{
+"id": 9,
+"seconds": 10.8,
+"err": null,
+"out": {
+"unreadable": 0,
+"people": [
+{
+"name": "José Muñoz",
+"firm": "Santander",
+"email": "jmunoz@santander.com"
+},
+{
+"name": "Siobhán Ní Bhriain",
+"firm": "Accenture",
+"email": "siobhan.nb@gmail.com"
+},
+{
+"name": "Łukasz Nowak",
+"firm": "Allegro",
+"email": "lnowak@allegro.pl"
+},
+{
+"name": "Nguyễn Thị Lan",
+"firm": "VNG",
+"email": "lan.nguyen@vng.com.vn"
+},
+{
+"name": "Zoë Müller",
+"firm": "Siemens",
+"email": "zoe.mueller@siemens.com"
+},
+{
+"name": "Aarav Gupta",
+"firm": "Infosys",
+"email": "aarav.gupta@infosys.com"
+},
+{
+"name": "Chidi Okeke",
+"firm": "Flutterwave",
+"email": "cokeke@flutterwave.com"
+},
+{
+"name": "Yuki Tanaka",
+"firm": "Sony",
+"email": "ytanaka@sony.co.jp"
+}
+]
+}
+},
+{
+"id": 10,
+"seconds": 5.6,
+"err": null,
+"out": {
+"unreadable": 0,
+"people": [
+{
+"name": "Jake Peterson",
+"firm": "coca-cola",
+"email": "jake.p@gmail.com"
+},
+{
+"name": "Ana Silva",
+"firm": "Unilever",
+"email": "asilva@unilever.com"
+},
+{
+"name": "Kris Patel",
+"firm": "Patel Studio",
+"email": "kris@patelstudio.co"
+},
+{
+"name": "Morgan Yates",
+"firm": "HubSpot",
+"email": "myates@hubspot.com"
+},
+{
+"name": "Lena Park",
+"firm": "",
+"email": ""
+},
+{
+"name": "Theo Russo",
+"firm": "Red Bull",
+"email": "trusso@redbull.com"
+}
+]
+}
+}
+]

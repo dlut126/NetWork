@@ -1,0 +1,249 @@
+[
+{
+"id": 103,
+"seconds": 10,
+"err": null,
+"out": {
+"unreadable": 4,
+"people": [
+{
+"name": "Max Morgan",
+"firm": "Google",
+"email": "mmorgan@google.com",
+"unsure": [
+"name",
+"email"
+]
+},
+{
+"name": "Chloe Bennett",
+"firm": "Airbnb",
+"email": "",
+"unsure": [
+"name",
+"firm",
+"email"
+]
+},
+{
+"name": "Emily Zhang",
+"firm": "Microsoft",
+"email": "emilyzhang@microsoft.com",
+"unsure": [
+"name",
+"email"
+]
+},
+{
+"name": "Isabel Cruz",
+"firm": "Apple",
+"email": "icruz@apple.com",
+"unsure": [
+"name",
+"email"
+]
+},
+{
+"name": "Fatima Ali",
+"firm": "",
+"email": "",
+"unsure": [
+"name",
+"firm",
+"email"
+]
+},
+{
+"name": "Zoe Park",
+"firm": "Pinterest",
+"email": "zpark@pinterest.com",
+"unsure": [
+"name",
+"email"
+]
+}
+]
+}
+},
+{
+"id": 108,
+"seconds": 13.4,
+"err": null,
+"out": {
+"unreadable": 2,
+"people": [
+{
+"name": "Abigail Turner",
+"firm": "Goldman Sachs",
+"email": "aturner@gmail.com",
+"unsure": [
+"name",
+"firm",
+"email"
+]
+},
+{
+"name": "Brianna Lopez",
+"firm": "J.P. Morgan",
+"email": "blopez@jpmorgan.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Camila Reyes",
+"firm": "PwC",
+"email": "creyes@pwc.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Dana Whitfield",
+"firm": "KPMG",
+"email": "dwhitfield@kpmg.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Erin Olucia",
+"firm": "Nike",
+"email": "eolucia@nike.com",
+"unsure": [
+"name",
+"email"
+]
+},
+{
+"name": "Fiona Grant",
+"firm": "",
+"email": "",
+"unsure": [
+"firm",
+"email"
+]
+},
+{
+"name": "Heather Lin",
+"firm": "Visa",
+"email": "hlin@visa.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Ivy Chen",
+"firm": "",
+"email": "ivychen@gmail.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Julia Novak",
+"firm": "Tesla",
+"email": "jnovak@tesla.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Kara Mitchell",
+"firm": "Hulu",
+"email": "kmitchell@hulu.com",
+"unsure": [
+"email",
+"firm"
+]
+},
+{
+"name": "Leah Goldberg",
+"firm": "Bain",
+"email": "lgoldberg@bain.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Monica Alvarez",
+"firm": "Target",
+"email": "malvarez@target.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Natalie Brooks",
+"firm": "IBM",
+"email": "nbrooks@ibm.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Quinn Harper",
+"firm": "",
+"email": "qharper@yahoo.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Katy Evans",
+"firm": "Oracle",
+"email": "kevans@oracle.com",
+"unsure": [
+"name",
+"email"
+]
+},
+{
+"name": "Sara Haddad",
+"firm": "Cisco",
+"email": "shaddad@cisco.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Tessa Morgan",
+"firm": "Lyft",
+"email": "tmorgan@lyft.com",
+"unsure": [
+"email"
+]
+},
+{
+"name": "Uma Krishnan",
+"firm": "Deloitte",
+"email": "ukrishnan@deloitte.com",
+"unsure": [
+"email",
+"firm"
+]
+}
+]
+}
+},
+{
+"id": 109,
+"seconds": 5.2,
+"err": null,
+"out": {
+"unreadable": 7,
+"people": [
+{
+"name": "Zak Mahler",
+"firm": "",
+"email": "",
+"unsure": [
+"name",
+"firm",
+"email"
+]
+}
+]
+}
+}
+]

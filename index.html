@@ -873,8 +873,8 @@ function drawPending(){
   if (!pending.length){ out.innerHTML = ""; return; }
   const n = pending.length;
   out.innerHTML = `${n > 1 ? `<div class="row pending-head"><button class="btn primary" id="saveAll">Save all ${n}</button><button class="btn" id="discardAll">Discard all</button></div>` : ""}
-    ${pending.map(it => { const d = it.data; const open = it.open; const un = (it.unsure||[]).map(f => ({firm:"company", linkedin:"LinkedIn"}[f] || f)); return `<div class="pcard${un.length ? " unsure" : ""}" data-u="${it.uid}">
-      ${un.length ? `<div class="unsure-note">Hard to read: check the ${esc(un.join(", "))} against the photo</div>` : ""}
+    ${[...pending].sort((a, b) => (b.unsure?.length ? 1 : 0) - (a.unsure?.length ? 1 : 0)).map(it => { const d = it.data; const open = it.open; const un = (it.unsure||[]).map(f => ({firm:"company", linkedin:"LinkedIn"}[f] || f)); return `<div class="pcard${un.length ? " unsure" : ""}" data-u="${it.uid}">
+      ${un.length ? `<div class="unsure-note">Hard to read: check the ${esc(un.length > 1 ? un.slice(0, -1).join(", ") + " and " + un.at(-1) : un[0])} against the photo</div>` : ""}
       <div class="pc-top">${avatar(d.name)}<div style="min-width:0;flex:1">
         <div class="cname">${esc(d.name)} ${it.matchKey ? `<span class="tagnote">Already in contacts: logs a ${esc((d.kind || "conversation").toLowerCase())}</span>` : ""}</div>
         <div class="csub" style="white-space:normal">${esc([d.role, d.firm].filter(Boolean).join(" · ") || "No company noted")}${d.email ? " · " + esc(d.email) : ""}${d.followUp ? " · follow up " + esc(fmtDate(d.followUp)) : ""}</div>

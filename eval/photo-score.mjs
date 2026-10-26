@@ -19,7 +19,7 @@ const same = {name: (a, b) => exact(a) === exact(b), email: (a, b) => exact(a) =
 const FIELDS = ["email", "firm", "phone", "linkedin"];
 
 const FL = {wrong: 0, wrongFlagged: 0, right: 0, rightFlagged: 0};
-const T = {people: 0, found: 0, nameExact: 0, rowsPerfect: 0, extra: 0, invented: 0, skipLeaked: 0, skipTotal: 0, failed: 0, secs: []};
+const T = {extraFlagged: 0, people: 0, found: 0, nameExact: 0, rowsPerfect: 0, extra: 0, invented: 0, skipLeaked: 0, skipTotal: 0, failed: 0, secs: []};
 const F = Object.fromEntries(FIELDS.map(f => [f, {right: 0, of: 0}]));
 const rows = [], misses = [];
 for (const t of truth){
@@ -46,7 +46,8 @@ for (const t of truth){
     if (allOk) perfect++;
   }
   const extras = got.filter(g => !g.used);
-  for (const x of extras) misses.push(`#${t.id} extra person "${x.name}"${t.should_skip.some(s => sim(s, x.name) > 0.75) ? " (crossed out or unreadable on the sheet)" : ""}`);
+  for (const x of extras){ const xf = Array.isArray(x.unsure) && x.unsure.includes("name"); T.extraFlagged += xf ? 1 : 0;
+    misses.push(`#${t.id} extra person "${x.name}"${t.should_skip.some(s => sim(s, x.name) > 0.75) ? " (crossed out or unreadable on the sheet)" : " (a misread name)"}${xf ? " [flagged]" : ""}`); }
   const leaked = t.should_skip.filter(s => extras.some(x => sim(s, x.name) > 0.75)).length;
   T.found += found; T.nameExact += nameOk; T.rowsPerfect += perfect; T.extra += extras.length; T.invented += invented;
   T.skipLeaked += leaked; T.skipTotal += t.should_skip.length;
@@ -57,5 +58,5 @@ console.log(`| # | Sheet | People found | Names exact | Rows fully right | Extra
 console.log(`\nTOTAL: found ${T.found}/${T.people} (${pct(T.found, T.people)}), names exact ${T.nameExact}/${T.people} (${pct(T.nameExact, T.people)}), rows fully right ${T.rowsPerfect}/${T.people} (${pct(T.rowsPerfect, T.people)})`);
 console.log(FIELDS.map(f => `${f} right ${F[f].right}/${F[f].of} (${pct(F[f].right, F[f].of)})`).join(", "));
 console.log(`extra people ${T.extra}, crossed-out/unreadable rows wrongly added ${T.skipLeaked}/${T.skipTotal}, invented fields ${T.invented}, failed photos ${T.failed}, median time ${T.secs.sort((a, b) => a - b)[Math.floor(T.secs.length / 2)] ?? "–"}s`);
-console.log(`"Hard to read" flags: caught ${FL.wrongFlagged} of ${FL.wrong} wrong values; flagged ${FL.rightFlagged} of ${FL.right} correct values unnecessarily`);
+console.log(`"Hard to read" flags: caught ${FL.wrongFlagged + T.extraFlagged} of ${FL.wrong + T.extra} wrong values (counting misread names); flagged ${FL.rightFlagged} of ${FL.right} correct values unnecessarily`);
 console.log("\nEvery miss:\n" + (misses.join("\n") || "(none)"));
