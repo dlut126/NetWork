@@ -2,7 +2,7 @@
 // How: open the live site, open the browser console, paste this file, and wait about a minute.
 // Results land in window.__photoEval.results; copy them into eval/photos/results.json and run `npm run eval:photos`.
 (async () => {
-  const truth = await (await fetch("eval/photos/truth.json")).json();
+  const truth = await (await fetch("eval/photos/" + (window.__photoTruth || "truth.json"))).json();
   window.__photoEval = {started: new Date().toISOString(), done: 0, total: truth.length, results: []};
   const one = async t => {
     const blob = await (await fetch("eval/photos/" + t.file)).blob();

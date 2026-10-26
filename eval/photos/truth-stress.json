@@ -1,0 +1,295 @@
+[
+ {
+  "id": 103,
+  "file": "stress-03.jpg",
+  "desc": "STRESS: sheet 3, heavy blur, dark, 900px wide",
+  "event": "Tech Trek Info Session",
+  "people": [
+   {
+    "name": "Alex Morgan",
+    "firm": "Google",
+    "email": "amorgan@google.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Chloe Bennett",
+    "firm": "Airbnb",
+    "email": "chloe.b@airbnb.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Raj Malhotra",
+    "firm": "Nvidia",
+    "email": "rmalhotra@nvidia.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Emily Zhang",
+    "firm": "Microsoft",
+    "email": "emzhang@microsoft.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Sam O'Connor",
+    "firm": "Uber",
+    "email": "soconnor@uber.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Isabel Cruz",
+    "firm": "Apple",
+    "email": "icruz@apple.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Derek Johnson",
+    "firm": "Snowflake",
+    "email": "derek.johnson@snowflake.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Fatima Ali",
+    "firm": "Datadog",
+    "email": "fali@datadoghq.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Liam Murphy",
+    "firm": "LinkedIn",
+    "email": "lmurphy@linkedin.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Zoe Park",
+    "firm": "Pinterest",
+    "email": "zpark@pinterest.com",
+    "phone": "",
+    "linkedin": ""
+   }
+  ],
+  "should_skip": []
+ },
+ {
+  "id": 108,
+  "file": "stress-08.jpg",
+  "desc": "STRESS: sheet 8, heavy blur, dark, 850px wide",
+  "event": "Women in Business — Annual Kickoff",
+  "people": [
+   {
+    "name": "Abigail Turner",
+    "firm": "Goldman Sachs",
+    "email": "aturner@gmail.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Brianna Lopez",
+    "firm": "J.P. Morgan",
+    "email": "blopez@jpmorgan.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Camila Reyes",
+    "firm": "PwC",
+    "email": "creyes@pwc.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Dana Whitfield",
+    "firm": "KPMG",
+    "email": "dwhitfield@kpmg.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Erin O'Neill",
+    "firm": "Nike",
+    "email": "eoneill@nike.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Fiona Grant",
+    "firm": "L'Oréal",
+    "email": "fgrant@loreal.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Gabriela Santos",
+    "firm": "P&G",
+    "email": "gsantos@pg.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Heather Lin",
+    "firm": "Visa",
+    "email": "hlin@visa.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Ivy Chen",
+    "firm": "",
+    "email": "ivy.chen@gmail.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Julia Novak",
+    "firm": "Tesla",
+    "email": "jnovak@tesla.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Kara Mitchell",
+    "firm": "Hulu",
+    "email": "kmitchell@hulu.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Leah Goldberg",
+    "firm": "Bain",
+    "email": "lgoldberg@bain.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Monica Alvarez",
+    "firm": "Target",
+    "email": "malvarez@target.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Natalie Brooks",
+    "firm": "IBM",
+    "email": "nbrooks@ibm.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Paige Ellis",
+    "firm": "Intuit",
+    "email": "pellis@intuit.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Quinn Harper",
+    "firm": "",
+    "email": "qharper@yahoo.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Riley Evans",
+    "firm": "Oracle",
+    "email": "revans@oracle.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Sara Haddad",
+    "firm": "Cisco",
+    "email": "shaddad@cisco.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Tessa Morgan",
+    "firm": "Lyft",
+    "email": "tmorgan@lyft.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Uma Krishnan",
+    "firm": "Deloitte",
+    "email": "ukrishnan@deloitte.com",
+    "phone": "",
+    "linkedin": ""
+   }
+  ],
+  "should_skip": []
+ },
+ {
+  "id": 109,
+  "file": "stress-09.jpg",
+  "desc": "STRESS: sheet 9, heavy blur, dark, 800px wide",
+  "event": "Global Business Club Welcome Night",
+  "people": [
+   {
+    "name": "José Muñoz",
+    "firm": "Santander",
+    "email": "jmunoz@santander.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Siobhán Ní Bhriain",
+    "firm": "Accenture",
+    "email": "siobhan.nb@gmail.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Łukasz Nowak",
+    "firm": "Allegro",
+    "email": "lnowak@allegro.pl",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Nguyễn Thị Lan",
+    "firm": "VNG",
+    "email": "lan.nguyen@vng.com.vn",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Zoë Müller",
+    "firm": "Siemens",
+    "email": "zoe.mueller@siemens.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Aarav Gupta",
+    "firm": "Infosys",
+    "email": "aarav.gupta@infosys.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Chidi Okeke",
+    "firm": "Flutterwave",
+    "email": "cokeke@flutterwave.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Yuki Tanaka",
+    "firm": "Sony",
+    "email": "ytanaka@sony.co.jp",
+    "phone": "",
+    "linkedin": ""
+   }
+  ],
+  "should_skip": []
+ }
+]

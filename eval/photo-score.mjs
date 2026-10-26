@@ -1,7 +1,7 @@
 // Scores photo extraction against hand-written answer keys. Usage: node eval/photo-score.mjs [results.json]
 import fs from "fs";
 const dir = new URL("./photos/", import.meta.url);
-const truth = JSON.parse(fs.readFileSync(new URL("truth.json", dir)));
+const truth = JSON.parse(fs.readFileSync(new URL(process.argv[3] || "truth.json", dir)));
 const resFile = process.argv[2] ? new URL(process.argv[2], `file://${process.cwd()}/`) : new URL("results.json", dir);
 const results = JSON.parse(fs.readFileSync(resFile));
 
