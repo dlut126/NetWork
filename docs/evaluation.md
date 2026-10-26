@@ -115,6 +115,15 @@ People usually keep contacts in Excel, with their own column names. We built 5 t
 | 4-unusual-headers.xlsx | "Who I talked to", "Where they're at now", "What they do", "Reach them", "When" | Asks for a Name header (correct) | ✓ mapped by AI |
 | 5-no-names.xlsx | Event attendance counts, no people | Refused (correct) | Refused (correct) |
 
+**Real-world check.** We then ran a real 120-person consulting club contact tracker (kept out of the repo for privacy). It broke the importer in ways the test files didn't. The "Practice Area" header sat over the email column, so **0 of 120 emails** came through. It also had a placeholder email ("NEED"), an email with a comment after it, LinkedIn cells showing "Name | LinkedIn" with the real link stored as a hyperlink underneath, tracking codes in URLs, a date typed "Oct 9th", and about 930 empty formatted rows. Fixes:
+- detect email and LinkedIn columns by their contents
+- move a header that lands on the wrong data to the unlabeled column next to it
+- read hyperlinks
+- move placeholders to notes
+- handle ordinal dates and strip tracking codes
+
+Result: **1,080 of 1,080 fields** match the sheet, and the 5 test files still pass.
+
 **Safeguards.** Before importing, the preview shows how each column was read ("Firm → Company") so the person can catch a wrong match. When the AI maps the columns, the preview says so. And if the AI picks a "name" column full of dates or numbers, the import is refused (tested by giving it a deliberately wrong mapping). Reminders for imported people stay off unless the person turns them on, but follow-up dates from the sheet still show up on Today.
 
 ## Other evaluations planned (not yet run)
