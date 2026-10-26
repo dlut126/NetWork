@@ -1738,11 +1738,12 @@ async function readAnyContactsFile(file){
 
 let importData = null;
 function importHTML(){
-  return `<div class="steps"><b>From LinkedIn</b>
-      <ol><li>On LinkedIn, open <b>Settings &amp; Privacy</b>, then <b>Data privacy</b>, then <b>Get a copy of your data</b>.</li>
-      <li>Choose <b>Connections</b> only and request the archive. LinkedIn emails you a download link, usually within minutes.</li>
-      <li>Unzip it and choose <b>Connections.csv</b> below.</li></ol>
-      <p class="hint"><b>Your own spreadsheet works too:</b> Excel (.xlsx, .xls), Numbers, Google Sheets (download as .xlsx or CSV), or a Google, iPhone, or Outlook contacts export. Any column names are fine as long as one column has names. You'll see how each column was read before anything is saved.</p></div>
+  return `<div class="steps"><b>From your spreadsheet</b>
+      <p class="hint" style="margin:0">Excel (.xlsx, .xls), Numbers, Google Sheets (File → Download → .xlsx), or CSV. Use whatever column names you already have, as long as one column has names. You'll see how each column was read before anything is saved.</p>
+      <b style="margin-top:6px">From LinkedIn</b>
+      <ol><li>On LinkedIn, open <b>Settings &amp; Privacy</b> → <b>Data privacy</b> → <b>Get a copy of your data</b>.</li>
+      <li>Choose <b>Connections</b> only. LinkedIn emails you a download link, usually within minutes.</li>
+      <li>Unzip it and choose <b>Connections.csv</b> below. Google, iPhone, and Outlook contact exports work too.</li></ol></div>
     <div class="file-row"><input type="file" id="impFile" accept=".csv,.tsv,.txt,.xlsx,.xlsm,.xls,.ods,.numbers,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"><span class="hint" id="impHint"></span></div>
     <div id="impOut"></div>`;
 }

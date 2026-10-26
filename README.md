@@ -169,9 +169,9 @@ See [docs/evaluation.md](docs/evaluation.md) for full results, test data, and sc
 - **Importing spreadsheets.** 5 test files (a clean tracker, a messy personal sheet with title rows and an instructions tab, an old .xls, unusual headers, and a sheet with no people): 10 of 10 checks pass with and without AI. Unusual headers need the AI; a sheet with no names is refused instead of importing junk. Run `npm test`.
 - **Reading sign-up sheet photos.** 10 synthetic sign-up sheet photos, 83 people, with answer keys, run through the live app. It found **all 83 people with every name exactly right** (accents included) and 97–99% of emails exact. It made up no fields and added no crossed-out rows. On deliberately terrible photos it mostly skips rather than guesses, but it made 6 confident misreads. After we added **"Hard to read" flags**, all of them (and both misses on the normal sheets) are highlighted on the review card before saving.
 
-| The 10 test photos | What you see when something is hard to read |
-|---|---|
-| ![All 10 test photos](docs/screenshots/photo-test-sheets.jpg) | ![Review cards with Hard to read flags shown first](docs/screenshots/photo-hard-to-read.png) |
+| Importing a messy Excel sheet | The 10 test photos | What you see when something is hard to read |
+|---|---|---|
+| ![Excel import preview showing how each column was read](docs/screenshots/import-excel.png) | ![All 10 test photos](docs/screenshots/photo-test-sheets.jpg) | ![Review cards with Hard to read flags shown first](docs/screenshots/photo-hard-to-read.png) |
 
 ## What's next
 
