@@ -218,6 +218,8 @@ ul.plain{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;m
 .linkish{all:unset;cursor:pointer;color:var(--accent);font-weight:600;text-decoration:underline}
 .pending{display:flex;flex-direction:column;gap:10px}
 .pcard{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.pcard.unsure{border-color:var(--attn)}
+.unsure-note{font-size:13px;font-weight:600;color:var(--attn);background:var(--attn-wash);padding:6px 10px;border-radius:8px}
 .pc-top{display:flex;gap:12px;align-items:flex-start}
 details.more{border-top:1px solid var(--line);padding-top:10px}
 details.more summary{cursor:pointer;color:var(--accent);font-weight:500;font-size:14px;margin-bottom:10px}
@@ -814,7 +816,8 @@ ${text}`;
     if (!ppl.length) throw {code:"invalid_json"};
     for (const p of ppl.reverse()){
       const match = real.find(e => keyOf(e.name,e.firm) === keyOf(p.name,p.firm)) || (p.existing ? real.find(e => e.name.toLowerCase() === String(p.name).toLowerCase()) : null);
-      pending.unshift({uid:uidGen(), matchKey: match?.key || null, data:{...p,
+      const unsure = (Array.isArray(p.unsure) ? p.unsure : []).filter(f => ["name","firm","email","phone","linkedin"].includes(f) && (f === "name" || String(p[f]||"").trim()));
+      pending.unshift({uid:uidGen(), matchKey: match?.key || null, unsure, data:{...p,
         firm: match ? match.firm : p.firm, howMet: p.howMet || quickContext, lastContact: p.lastContact || today(), metHow: MEET[p.metHow] ? p.metHow : quickMet,
         notes:[p.notes, p.introducedBy ? `Introduced by ${p.introducedBy}.` : ""].filter(Boolean).join(" "),
         tags:Array.isArray(p.tags)?p.tags:[], cadence:match?.cadence ?? 90}});
@@ -829,7 +832,8 @@ ${text}`;
 // The photo step, kept in one place so eval/photo-run.js tests exactly what the app runs.
 const PHOTO_PROMPT = `The user took this photo to add people to their networking contacts. It may show a sign-up sheet, attendee list, business card(s), name tags, or a slide with names. Extract every person whose name you can read clearly.
 Rules: include only names you can actually read, and skip rows you can't read rather than guessing. Never invent a company, role, or email; leave a field "" when it isn't written. If the page shows an event name or title, put it in "event".
-Reply with only JSON: {"event": "", "unreadable": 0, "people": [{"name": "", "firm": "", "role": "", "email": "", "phone": "", "linkedin": "", "notes": "anything else written next to them"}]}`;
+For each person, list in "unsure" every field ("name", "firm", "email", "phone", "linkedin") where you are not certain of every character: blurry, smudged, cut off, or partly inferred. Be strict when the photo is blurry or dark: a flagged field costs the user a glance, a wrong email costs them a bounced message.
+Reply with only JSON: {"event": "", "unreadable": 0, "people": [{"name": "", "firm": "", "role": "", "email": "", "phone": "", "linkedin": "", "notes": "anything else written next to them", "unsure": []}]}`;
 async function extractPhoto(file){ return sample.json(PHOTO_PROMPT, {images:file}); }
 async function runPhoto(u, file){
   const st = $("#"+u+"-st");
@@ -848,11 +852,14 @@ async function runPhoto(u, file){
     const group = ppl.length > 5;
     for (const p of ppl.reverse()){
       const match = real.find(e => keyOf(e.name,e.firm) === keyOf(p.name,p.firm)) || real.find(e => e.name.toLowerCase() === String(p.name).trim().toLowerCase() && !p.firm);
-      pending.unshift({uid:uidGen(), matchKey: match?.key || null, data:{...p, name:String(p.name).trim(), firm: match && !p.firm ? match.firm : (p.firm||""),
+      const unsure = (Array.isArray(p.unsure) ? p.unsure : []).filter(f => ["name","firm","email","phone","linkedin"].includes(f) && (f === "name" || String(p[f]||"").trim()));
+      pending.unshift({uid:uidGen(), matchKey: match?.key || null, unsure, data:{...p, name:String(p.name).trim(), firm: match && !p.firm ? match.firm : (p.firm||""),
         howMet: where, metHow: quickMet, tags: [], cadence: 90, lastContact: today(), oweFollowUp: !group}});
     }
     const bad = Number(r.unreadable) || 0;
+    const nUnsure = pending.filter(it => it.unsure?.length).length;
     st.textContent = `Found ${ppl.length} ${ppl.length === 1 ? "person" : "people"}${where ? ` from ${where}` : ""}${bad ? ` (${bad} row${bad>1?"s were":" was"} too hard to read)` : ""}. Check them, then save.`
+      + (nUnsure ? ` ${nUnsure} ${nUnsure === 1 ? "is" : "are"} marked “Hard to read”: check ${nUnsure === 1 ? "it" : "those"} against the photo.` : "")
       + (group ? " Follow-up reminders are off for a group this size so your to-do list doesn't fill up; use Group email to write to everyone at once." : "");
     drawPending();
   }catch(e){
@@ -866,7 +873,8 @@ function drawPending(){
   if (!pending.length){ out.innerHTML = ""; return; }
   const n = pending.length;
   out.innerHTML = `${n > 1 ? `<div class="row pending-head"><button class="btn primary" id="saveAll">Save all ${n}</button><button class="btn" id="discardAll">Discard all</button></div>` : ""}
-    ${pending.map(it => { const d = it.data; const open = it.open; return `<div class="pcard" data-u="${it.uid}">
+    ${pending.map(it => { const d = it.data; const open = it.open; const un = (it.unsure||[]).map(f => ({firm:"company", linkedin:"LinkedIn"}[f] || f)); return `<div class="pcard${un.length ? " unsure" : ""}" data-u="${it.uid}">
+      ${un.length ? `<div class="unsure-note">Hard to read: check the ${esc(un.join(", "))} against the photo</div>` : ""}
       <div class="pc-top">${avatar(d.name)}<div style="min-width:0;flex:1">
         <div class="cname">${esc(d.name)} ${it.matchKey ? `<span class="tagnote">Already in contacts: logs a ${esc((d.kind || "conversation").toLowerCase())}</span>` : ""}</div>
         <div class="csub" style="white-space:normal">${esc([d.role, d.firm].filter(Boolean).join(" · ") || "No company noted")}${d.email ? " · " + esc(d.email) : ""}${d.followUp ? " · follow up " + esc(fmtDate(d.followUp)) : ""}</div>
@@ -881,7 +889,7 @@ function drawPending(){
     const p = savePerson(it.data, it.matchKey, false, it.uid+"-st"); if (!p) return;
     pending = pending.filter(x => x !== it); afterPendingSave(p, 1);
   });
-  out.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => { const it = pending.find(x => x.uid === b.dataset.edit); it.open = !it.open; drawPending(); });
+  out.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => { const it = pending.find(x => x.uid === b.dataset.edit); it.open = !it.open; if (!it.open) it.unsure = []; drawPending(); });
   out.querySelectorAll("[data-discard]").forEach(b => b.onclick = () => { pending = pending.filter(x => x.uid !== b.dataset.discard); drawPending(); });
   const sa = $("#saveAll"); if (sa) sa.onclick = async () => {
     sa.disabled = true; let last, n = 0; const saved = [];

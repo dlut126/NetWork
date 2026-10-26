@@ -18,6 +18,7 @@ const same = {name: (a, b) => exact(a) === exact(b), email: (a, b) => exact(a) =
   phone: (a, b) => digits(a) === digits(b), linkedin: (a, b) => li(a) === li(b)};
 const FIELDS = ["email", "firm", "phone", "linkedin"];
 
+const FL = {wrong: 0, wrongFlagged: 0, right: 0, rightFlagged: 0};
 const T = {people: 0, found: 0, nameExact: 0, rowsPerfect: 0, extra: 0, invented: 0, skipLeaked: 0, skipTotal: 0, failed: 0, secs: []};
 const F = Object.fromEntries(FIELDS.map(f => [f, {right: 0, of: 0}]));
 const rows = [], misses = [];
@@ -33,10 +34,13 @@ for (const t of truth){
     for (const g of got) if (!g.used){ const s = sim(p.name, g.name); if (s > bs){ bs = s; best = g; } }
     if (!best || bs < 0.75){ misses.push(`#${t.id} missed ${p.name}`); continue; }
     best.used = true; found++;
-    const nOk = same.name(p.name, best.name); if (nOk) nameOk++; else misses.push(`#${t.id} name "${p.name}" read as "${best.name}"`);
+    const fl = new Set(Array.isArray(best.unsure) ? best.unsure : []);
+    const tally = (ok, f) => { if (ok){ FL.right++; if (fl.has(f)) FL.rightFlagged++; } else { FL.wrong++; if (fl.has(f)) FL.wrongFlagged++; } };
+    const nOk = same.name(p.name, best.name); tally(nOk, "name"); if (nOk) nameOk++; else misses.push(`#${t.id} name "${p.name}" read as "${best.name}"${fl.has("name") ? " [flagged]" : ""}`);
     let allOk = nOk;
     for (const f of FIELDS){
-      if (p[f]){ F[f].of++; if (same[f](p[f], best[f])) F[f].right++; else { allOk = false; misses.push(`#${t.id} ${p.name} ${f}: "${p[f]}" read as "${best[f] || ""}"`); } }
+      if (p[f]){ F[f].of++; const ok = same[f](p[f], best[f]); if (String(best[f] || "").trim()) tally(ok, f);
+        if (ok) F[f].right++; else { allOk = false; misses.push(`#${t.id} ${p.name} ${f}: "${p[f]}" read as "${best[f] || ""}"${fl.has(f) ? " [flagged]" : ""}`); } }
       else if (String(best[f] || "").trim()){ invented++; allOk = false; misses.push(`#${t.id} ${p.name} ${f}: blank on sheet, app put "${best[f]}"`); }
     }
     if (allOk) perfect++;
@@ -53,4 +57,5 @@ console.log(`| # | Sheet | People found | Names exact | Rows fully right | Extra
 console.log(`\nTOTAL: found ${T.found}/${T.people} (${pct(T.found, T.people)}), names exact ${T.nameExact}/${T.people} (${pct(T.nameExact, T.people)}), rows fully right ${T.rowsPerfect}/${T.people} (${pct(T.rowsPerfect, T.people)})`);
 console.log(FIELDS.map(f => `${f} right ${F[f].right}/${F[f].of} (${pct(F[f].right, F[f].of)})`).join(", "));
 console.log(`extra people ${T.extra}, crossed-out/unreadable rows wrongly added ${T.skipLeaked}/${T.skipTotal}, invented fields ${T.invented}, failed photos ${T.failed}, median time ${T.secs.sort((a, b) => a - b)[Math.floor(T.secs.length / 2)] ?? "–"}s`);
+console.log(`"Hard to read" flags: caught ${FL.wrongFlagged} of ${FL.wrong} wrong values; flagged ${FL.rightFlagged} of ${FL.right} correct values unnecessarily`);
 console.log("\nEvery miss:\n" + (misses.join("\n") || "(none)"));
