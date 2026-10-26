@@ -735,7 +735,7 @@ function captureHTML(u){
       <span class="status" id="${u}-st"></span>
     </div>
     <p class="hint">${sample ? "A photo of a sign-up sheet, business card, or name tags adds everyone on it. " : ""}Mention someone already in your contacts and it logs the conversation instead.</p>
-    <div class="more-links"><button class="linkish" id="${u}-full">Fill in every field</button><span aria-hidden="true">·</span><button class="linkish" id="${u}-imp">Import contacts</button></div>
+    <div class="more-links"><button class="linkish" id="${u}-full">Fill in every field</button><span aria-hidden="true">·</span><button class="linkish" id="${u}-imp">Import from Excel or LinkedIn</button></div>
     <div id="pendingOut" class="pending"></div>`;
 }
 function bindCapture(u){
@@ -1598,35 +1598,142 @@ async function offerFile(filename, text){
   }catch{ return "failed"; }
 }
 
-// Reads LinkedIn's Connections.csv, or a Google / iPhone / Outlook contacts export, or any sheet with a name column
-function readContactsFile(text){
-  const rows = parseCSV(text);
-  const norm = s => s.trim().toLowerCase().replace(/\s+/g, " ");
-  const hi = rows.findIndex(r => r.some(c => /^(first name|given name|name|full name)$/.test(norm(c))));
-  if (hi < 0) return {error:"Couldn't find a name column. The file needs a header row with “Name”, or “First Name” and “Last Name”."};
-  const head = rows[hi].map(norm);
-  const col = (...names) => head.findIndex(h => names.includes(h));
-  const C = {
-    name: col("name","full name"), first: col("first name","given name"), last: col("last name","family name"),
-    firm: col("company","organization","company name","organization 1 - name","organization name"),
-    role: col("position","title","job title","organization 1 - title","organization title"),
-    email: col("email address","email","e-mail","e-mail address","e-mail 1 - value","email 1"),
-    phone: col("phone","mobile phone","phone number","phone 1 - value","mobile"),
-    linkedin: col("url","linkedin","linkedin url","profile url"),
-    connected: col("connected on"), notes: col("notes")
-  };
-  const fromLinkedIn = C.connected >= 0;
-  const get = (r, i) => i >= 0 ? (r[i] || "").trim() : "";
-  const toYmd = s => { if (!s) return ""; const t = new Date(s); return isNaN(t) ? "" : ymd(t); };
+// ---------- Reading contact spreadsheets: CSV, Excel (.xlsx/.xls), Numbers, OpenDocument ----------
+// Columns are matched by meaning, so "Firm", "Employer", and "Org" all count as company. Earlier patterns win.
+const COLMAP = [
+  ["email",       /e-?mail/],
+  ["phone",       /(phone|mobile|cell|^tel)/],
+  ["linkedin",    /(linkedin|profile url|^url$)/],
+  ["followUp",    /(follow.?up|next (step|touch|contact|reach.?out) (date|by)|reach out by|next touch)/],
+  ["lastContact", /(last (contact|contacted|touch|touchpoint|spoke|talked|reached|chat|conversation|interaction)|date met|met on|date of (contact|meeting|chat|call)|^date$|contacted on|connected on|when (we )?met|last met)/],
+  ["howMet",      /(how (we |you |i )?met|where (we |you |i )?met|^met (at|via|through)|^event|^source$|introduced by|^intro( by)?$|referr?ed by|referral|^context$|^met$)/],
+  ["first",       /^(first|first name|firstname|given name|fname|preferred name)$/],
+  ["last",        /^(last|last name|lastname|surname|family name|lname)$/],
+  ["name",        /^(name|names|full name|contact|contact name|person|who|attendee|guest|candidate|connection|people|person name)$/],
+  ["firm",        /(company|organi[sz]ation|^firm|employer|^org$|^business|works? at|where (they|he|she) works?|^school)/],
+  ["role",        /(title|position|role|^job|function|seniority|level)/],
+  ["industry",    /(industry|sector|^field$|vertical)/],
+  ["tags",        /(^tags?$|category|^group|^type$|^status$|^list$|^label|priority|tier)/],
+  ["notes",       /(notes?|comments?|details|summary|remarks|next steps?|topics?|discussed|takeaways?|^about$|^info$)/],
+];
+const FIELD_LABEL = {name:"Name", first:"First name", last:"Last name", firm:"Company", role:"Role", email:"Email", phone:"Phone", linkedin:"LinkedIn",
+  industry:"Industry", howMet:"How you met", lastContact:"Last contact", followUp:"Follow up by", tags:"Tags", notes:"Notes"};
+const normHead = s => String(s ?? "").trim().toLowerCase().replace(/[_*#:()\[\]]+/g, " ").replace(/\s+/g, " ").trim();
+function mapHeader(row){
+  const m = {};
+  row.forEach((h, i) => { const n = normHead(h); if (!n) return;
+    const hit = COLMAP.find(([f, re]) => m[f] === undefined && re.test(n)); if (hit) m[hit[0]] = i; });
+  return m;
+}
+const hasName = m => m.name !== undefined || m.first !== undefined;
+// Finds the header row: the first of the top 20 rows with a name column and at least one other known column
+function findHeader(rows){
+  for (let i = 0; i < Math.min(rows.length, 20); i++){ const m = mapHeader(rows[i]); if (hasName(m) && Object.keys(m).length >= 2) return {hi:i, map:m}; }
+  for (let i = 0; i < Math.min(rows.length, 20); i++){ const m = mapHeader(rows[i]); if (hasName(m)) return {hi:i, map:m}; }
+  return null;
+}
+// Dates arrive as Date objects (Excel), ISO text, "10/22/2026", "Oct 22", or Excel serial numbers
+function toYmdLoose(v){
+  if (v == null || v === "") return "";
+  if (v instanceof Date) return isNaN(v) ? "" : ymd(v);
+  const s = String(v).trim();
+  if (/^\d{5}(\.\d+)?$/.test(s)){ const n = Number(s); if (n > 20000 && n < 80000) return ymd(new Date(Math.round((n - 25569) * 86400000) + new Date().getTimezoneOffset() * 60000)); }
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+  let t = new Date(s);
+  if (!isNaN(t) && t.getFullYear() < 2000 && !/\d{4}/.test(s)) t.setFullYear(new Date().getFullYear());   // "Oct 22" with no year
+  return isNaN(t) || t.getFullYear() < 1950 ? "" : ymd(t);
+}
+function rowsToPeople(rows, hi, map){
+  const fromLinkedIn = rows[hi].some(c => normHead(c) === "connected on");
+  const get = (r, f) => map[f] !== undefined && map[f] >= 0 ? (r[map[f]] instanceof Date ? r[map[f]] : String(r[map[f]] ?? "").trim()) : "";
   const out = [];
+  let lastName = "";
   for (const r of rows.slice(hi + 1)){
-    const name = get(r, C.name) || [get(r, C.first), get(r, C.last)].filter(Boolean).join(" ");
-    if (!name) continue;
-    out.push({name, firm:get(r, C.firm), role:get(r, C.role), email:get(r, C.email), phone:get(r, C.phone),
-      linkedin:get(r, C.linkedin).replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, ""),
-      date: toYmd(get(r, C.connected)), notes:get(r, C.notes)});
+    let name = String(get(r, "name") || [get(r, "first"), get(r, "last")].filter(Boolean).join(" ")).trim();
+    if (!name || /^(total|totals|sum|count|name|example|e\.g\.?)\b/i.test(name) || name.length > 80) continue;
+    if (name === lastName && !get(r, "email")) continue;   // a repeated row
+    lastName = name;
+    const last = toYmdLoose(get(r, "lastContact")), fu = toYmdLoose(get(r, "followUp"));
+    const tags = String(get(r, "tags") || "").split(/[;,|]/).map(x => x.trim()).filter(Boolean).slice(0, 5);
+    out.push({name, firm:String(get(r, "firm")), role:String(get(r, "role")), email:String(get(r, "email")).replace(/^mailto:/i, ""), phone:String(get(r, "phone")),
+      linkedin:String(get(r, "linkedin")).replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, ""), industry:String(get(r, "industry")),
+      howMet:String(get(r, "howMet")), tags, notes:String(get(r, "notes")),
+      date: last && last <= today() ? last : "", followUp: fu});
   }
-  return {people:out, fromLinkedIn};
+  const used = Object.fromEntries(Object.entries(map).filter(([, i]) => i >= 0).map(([f, i]) => [f, String(rows[hi][i] ?? "").trim() || `column ${i + 1}`]));
+  return {people:out, fromLinkedIn, used};
+}
+// When the headers are too unusual for the rules, ask the AI which column is which (it sees the header and 5 rows only)
+async function aiMapColumns(rows){
+  if (!sample) return null;
+  const top = rows.slice(0, 12).map((r, i) => `row ${i}: ` + r.slice(0, 20).map((c, j) => `[${j}] ${String(c instanceof Date ? ymd(c) : c ?? "").slice(0, 40)}`).join(" | ")).join("\n");
+  try{
+    const r = await sample.json(`This is the top of a spreadsheet someone uses to track their professional contacts. Find the header row and which column holds each field. Use -1 when a field isn't there. Never guess a column whose values don't fit the field.
+
+${top}
+
+Reply with only JSON: {"headerRow": 0, "columns": {"name": -1, "first": -1, "last": -1, "firm": -1, "role": -1, "email": -1, "phone": -1, "linkedin": -1, "industry": -1, "howMet": -1, "lastContact": -1, "followUp": -1, "tags": -1, "notes": -1}}`, {modelTier:"quick"});
+    const hi = Number(r?.headerRow), cols = r?.columns || {};
+    const map = {}; for (const f of Object.keys(FIELD_LABEL)){ const i = Number(cols[f]); if (Number.isInteger(i) && i >= 0 && i < 60) map[f] = i; }
+    if (!Number.isInteger(hi) || hi < 0 || hi >= rows.length || !hasName(map)) return null;
+    // Sanity check: the "name" column should hold words, not dates or numbers
+    const vals = rows.slice(hi + 1, hi + 21).map(r => r[map.name ?? map.first]).filter(v => String(v ?? "").trim());
+    const wordy = vals.filter(v => !(v instanceof Date) && /^[\p{L}][\p{L}'’.\- ]{0,60}$/u.test(String(v).trim())).length;
+    if (!vals.length || wordy / vals.length < 0.7) return null;
+    return {hi, map};
+  }catch{ return null; }
+}
+async function readContactRows(rows){
+  rows = rows.filter(r => r.some(c => String(c ?? "").trim() !== ""));
+  if (!rows.length) return {error:"That file looks empty."};
+  let h = findHeader(rows), byAI = false;
+  if (!h){ h = await aiMapColumns(rows); byAI = !!h; }
+  if (!h) return {error: sample ? "Couldn't tell which column has names. Add a header row with “Name” (or “First Name” and “Last Name”) and try again."
+                                : "Couldn't find a name column. The file needs a header row with “Name”, or “First Name” and “Last Name”."};
+  return {...rowsToPeople(rows, h.hi, h.map), byAI};
+}
+// Kept for CSV callers and tests
+function readContactsFile(text){
+  const rows = parseCSV(text); const h = findHeader(rows);
+  if (!h) return {error:"Couldn't find a name column. The file needs a header row with “Name”, or “First Name” and “Last Name”."};
+  return rowsToPeople(rows, h.hi, h.map);
+}
+// Excel support loads only when someone picks a spreadsheet file
+let xlsxLoading = null;
+function loadXLSX(){
+  if (window.XLSX) return Promise.resolve(window.XLSX);
+  return xlsxLoading ||= new Promise((ok, bad) => {
+    const sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+    sc.onload = () => window.XLSX ? ok(window.XLSX) : bad(new Error("xlsx")); sc.onerror = () => { xlsxLoading = null; bad(new Error("xlsx")); };
+    document.head.append(sc);
+  });
+}
+// Picks the sheet that looks most like a contact list (skips "Instructions" or "Summary" tabs)
+async function readSpreadsheet(buf){
+  const X = await loadXLSX();
+  const wb = X.read(buf, {type:"array", cellDates:true});
+  let best = null;
+  for (const name of wb.SheetNames){
+    const rows = X.utils.sheet_to_json(wb.Sheets[name], {header:1, raw:true, defval:""});
+    const h = findHeader(rows.filter(r => r.some(c => String(c ?? "").trim() !== "")));
+    const score = (h ? 1000 : 0) + rows.length;
+    if (!best || score > best.score) best = {name, rows, score};
+  }
+  return {rows: best ? best.rows : [], sheet: best?.name, sheets: wb.SheetNames.length};
+}
+const readFileAs = (file, how) => new Promise((ok, bad) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = bad; how === "text" ? r.readAsText(file) : r.readAsArrayBuffer(file); });
+async function readAnyContactsFile(file){
+  const isCSV = /\.(csv|txt|tsv)$/i.test(file.name) || /text\/(csv|plain|tab)/.test(file.type);
+  if (isCSV){
+    const text = String(await readFileAs(file, "text"));
+    const tsv = /\.tsv$/i.test(file.name) || (!text.includes(",") && text.includes("\t"));
+    return readContactRows(tsv ? text.split(/\r?\n/).map(l => l.split("\t")) : parseCSV(text));
+  }
+  let sheet;
+  try{ sheet = await readSpreadsheet(new Uint8Array(await readFileAs(file, "buffer"))); }
+  catch{ return {error:"Couldn't open that spreadsheet. Try saving it as .xlsx or CSV and choosing it again."}; }
+  const r = await readContactRows(sheet.rows);
+  return sheet.sheets > 1 && !r.error ? {...r, sheet: sheet.sheet} : r;
 }
 
 let importData = null;
@@ -1635,17 +1742,17 @@ function importHTML(){
       <ol><li>On LinkedIn, open <b>Settings &amp; Privacy</b>, then <b>Data privacy</b>, then <b>Get a copy of your data</b>.</li>
       <li>Choose <b>Connections</b> only and request the archive. LinkedIn emails you a download link, usually within minutes.</li>
       <li>Unzip it and choose <b>Connections.csv</b> below.</li></ol>
-      <p class="hint">Google Contacts, iPhone, and Outlook exports work too, or any spreadsheet saved as CSV with a Name column.</p></div>
-    <div class="file-row"><input type="file" id="impFile" accept=".csv,text/csv"><span class="hint" id="impHint"></span></div>
+      <p class="hint"><b>Your own spreadsheet works too:</b> Excel (.xlsx, .xls), Numbers, Google Sheets (download as .xlsx or CSV), or a Google, iPhone, or Outlook contacts export. Any column names are fine as long as one column has names. You'll see how each column was read before anything is saved.</p></div>
+    <div class="file-row"><input type="file" id="impFile" accept=".csv,.tsv,.txt,.xlsx,.xlsm,.xls,.ods,.numbers,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"><span class="hint" id="impHint"></span></div>
     <div id="impOut"></div>`;
 }
 function bindImport(){
-  $("#impFile").onchange = () => {
+  $("#impFile").onchange = async () => {
     const f = $("#impFile").files?.[0]; if (!f) return;
-    const r = new FileReader();
-    r.onload = () => { importData = {file:f.name, ...readContactsFile(String(r.result || ""))}; drawImport(); };
-    r.onerror = () => { $("#impHint").textContent = "Couldn't read that file."; };
-    r.readAsText(f);
+    const hint = $("#impHint"); hint.textContent = "Reading…"; importData = null; drawImport();
+    try{ importData = {file:f.name, ...(await readAnyContactsFile(f))}; hint.textContent = ""; }
+    catch{ importData = {file:f.name, error:"Couldn't read that file."}; hint.textContent = ""; }
+    drawImport();
   };
   drawImport();
 }
@@ -1659,7 +1766,8 @@ function drawImport(){
   const dup = ppl.filter(p => existing.has(keyOf(p.name, p.firm))).length;
   out.innerHTML = `<div class="parsed">
       <div><b>${ppl.length} ${ppl.length === 1 ? "contact" : "contacts"}</b> in ${esc(importData.file)}${dup ? `, ${dup} already in NetWork (their empty fields get filled in)` : ""}.</div>
-      ${ppl.length ? `<div class="hint">${ppl.slice(0, 5).map(p => esc(p.name) + (p.firm ? " · " + esc(p.firm) : "")).join("<br>")}${ppl.length > 5 ? `<br>and ${ppl.length - 5} more` : ""}</div>` : ""}
+      ${importData.used ? `<div class="hint"><b>How each column was read${importData.byAI ? " (matched by AI, please check)" : ""}${importData.sheet ? ` from the “${esc(importData.sheet)}” tab` : ""}:</b> ${Object.entries(importData.used).map(([f, h]) => `${esc(h)} → ${esc(FIELD_LABEL[f] || f)}`).join(" · ")}</div>` : ""}
+      ${ppl.length ? `<div class="hint">${ppl.slice(0, 5).map(p => esc(p.name) + (p.firm ? " · " + esc(p.firm) : "") + (p.date ? " · last talked " + esc(fmtDate(p.date)) : "")).join("<br>")}${ppl.length > 5 ? `<br>and ${ppl.length - 5} more` : ""}</div>` : ""}
       <label class="row" style="gap:8px"><input type="checkbox" id="impRemind" style="width:18px;height:18px;accent-color:var(--accent)"> Remind me to stay in touch with these people</label>
       <p class="hint">Off by default so a big import doesn't flood your to-do list. You can turn reminders on for anyone from their card.</p>
       <div class="row"><button class="btn primary" id="impGo" ${ppl.length ? "" : "disabled"}>Import ${ppl.length}</button><span class="status" id="impSt"></span></div></div>`;
@@ -1675,15 +1783,18 @@ async function runImport(){
     const e = byKey.get(keyOf(r.name, r.firm));
     if (e){
       const p = ensurePerson(e);
-      for (const k of ["role","email","phone","linkedin"]) if (r[k] && !p[k]) p[k] = r[k];
+      for (const k of ["role","email","phone","linkedin","industry","howMet"]) if (r[k] && !p[k]) p[k] = r[k];
+      if (r.tags?.length) p.tags = [...new Set([...(p.tags||[]), ...r.tags])];
+      if (r.date && r.date > (p.lastContact||"")) addLog(p, {date:r.date, kind:"Talked", note:"From your spreadsheet"});
+      if (r.followUp && !p.followUp) p.followUp = r.followUp;
       if (r.notes && !(p.notes||"").includes(r.notes)) p.notes = p.notes ? p.notes + "\n" + r.notes : r.notes;
       touched.push(p);
     } else {
-      const p = {id:"p"+uidGen(), type:"person", name:r.name, firm:r.firm, role:r.role, industry:"", email:r.email, phone:r.phone, linkedin:r.linkedin,
-        howMet: importData.fromLinkedIn ? "LinkedIn connection" : "", metHow: importData.fromLinkedIn ? "online" : "",
-        tags: importData.fromLinkedIn ? ["LinkedIn"] : [], notes:r.notes, lastContact:"", followUp:"", cadence: remind ? 90 : 0,
+      const p = {id:"p"+uidGen(), type:"person", name:r.name, firm:r.firm, role:r.role, industry:r.industry||"", email:r.email, phone:r.phone, linkedin:r.linkedin,
+        howMet: r.howMet || (importData.fromLinkedIn ? "LinkedIn connection" : ""), metHow: importData.fromLinkedIn ? "online" : "",
+        tags: importData.fromLinkedIn ? ["LinkedIn"] : (r.tags || []), notes:r.notes, lastContact:"", followUp:r.followUp||"", cadence: remind ? 90 : 0,
         snoozeUntil:"", createdAt:Date.now(), complete:true, remember:[], owes:[], log:[]};
-      if (r.date) addLog(p, {date:r.date, kind:"Connected online", note: importData.fromLinkedIn ? "Connected on LinkedIn" : ""});
+      if (r.date) addLog(p, importData.fromLinkedIn ? {date:r.date, kind:"Connected online", note:"Connected on LinkedIn"} : {date:r.date, kind:"Talked", note:"From your spreadsheet"});
       people.push(p); byKey.set(keyOf(p.name, p.firm), {person:p}); touched.push(p);
     }
   }

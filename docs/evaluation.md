@@ -1,6 +1,6 @@
 # Evaluating NetWork
 
-Two evaluations: **(1)** deciding whether typed text is a name or a description, and **(2)** reading sign-up sheet photos.
+Three evaluations: **(1)** deciding whether typed text is a name or a description, **(2)** reading sign-up sheet photos, and **(3)** importing spreadsheets.
 
 ## Evaluation 1: name or description?
 
@@ -102,6 +102,20 @@ Plus a **stress set**: sheets 3, 8, and 9 made much worse (heavy blur, dark, low
 **Challenge case: the missing dot.** "derek.johnson@snowflake.com" in small handwriting reads as "derekjohnson@snowflake.com". It looks perfectly plausible, and a person skimming the card would likely miss it too. Before this change it saved silently. Now it carries a flag, so the person checks it against the photo before saving.
 
 **Limits of this test.** The photos are synthetic: handwriting fonts are neater and more consistent than real handwriting, so the normal-sheet numbers are best-case. The next step is the same scoring on 10 real sheets from club events.
+
+## Evaluation 3: importing spreadsheets
+
+People usually keep contacts in Excel, with their own column names. We built 5 test files with answer keys ([`eval/spreadsheets/`](../eval/spreadsheets)) and check every field of every person ([`eval/tests/spreadsheet-import.test.mjs`](../eval/tests/spreadsheet-import.test.mjs), `npm test`):
+
+| File | What makes it hard | Without AI | With AI |
+|---|---|---|---|
+| 1-mba-tracker.xlsx | Nothing: Name, Company, Title, Email, Date Met (real Excel dates), Notes | ✓ | ✓ |
+| 2-messy-recruiting.xlsx | "How to use" tab first, title rows above the header, First/Last split, "Firm", "Position", "Where we met", "Last contacted", "Next follow-up", a blank row, a TOTAL row | ✓ | ✓ |
+| 3-career-office.xls | Old Excel format; "Contact Name", "Organization", "E-mail Address", "Mobile", "LinkedIn URL" | ✓ | ✓ |
+| 4-unusual-headers.xlsx | "Who I talked to", "Where they're at now", "What they do", "Reach them", "When" | Asks for a Name header (correct) | ✓ mapped by AI |
+| 5-no-names.xlsx | Event attendance counts, no people | Refused (correct) | Refused (correct) |
+
+**Safeguards.** Before importing, the preview shows how each column was read ("Firm → Company") so the person can catch a wrong match. When the AI maps the columns, the preview says so. And if the AI picks a "name" column full of dates or numbers, the import is refused (tested by giving it a deliberately wrong mapping). Reminders for imported people stay off unless the person turns them on, but follow-up dates from the sheet still show up on Today.
 
 ## Other evaluations planned (not yet run)
 

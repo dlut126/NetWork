@@ -1,0 +1,107 @@
+[
+ {
+  "file": "1-mba-tracker.xlsx",
+  "desc": "Clean tracker: Name, Company, Title, Email, Date Met (real Excel dates), Notes",
+  "people": [
+   {
+    "name": "Priya Shah",
+    "firm": "Bain & Company",
+    "role": "Consultant",
+    "email": "priya.shah@bain.com",
+    "date": "2026-09-18"
+   },
+   {
+    "name": "Marco Ruiz",
+    "firm": "Google",
+    "role": "Product Manager",
+    "email": "mruiz@google.com",
+    "date": "2026-10-02"
+   },
+   {
+    "name": "Hannah Lee",
+    "firm": "Stripe",
+    "role": "Strategy & Ops",
+    "email": "hannah@stripe.com",
+    "date": "2026-10-14"
+   }
+  ]
+ },
+ {
+  "file": "2-messy-recruiting.xlsx",
+  "desc": "Instructions tab first, title rows above header, First/Last split, Firm/Position/Where we met/Last contacted/Next follow-up, blank row, TOTAL row",
+  "people": [
+   {
+    "name": "Daniel Okafor",
+    "firm": "McKinsey",
+    "role": "Associate",
+    "howMet": "Consulting club mixer",
+    "date": "2026-09-30",
+    "followUp": "2026-11-03"
+   },
+   {
+    "name": "Sofia Bianchi",
+    "firm": "Deloitte",
+    "role": "Senior Consultant",
+    "howMet": "Coffee chat via Jen",
+    "date": "2026-10-09"
+   },
+   {
+    "name": "Raj Iyer",
+    "firm": "BCG",
+    "role": "Principal",
+    "howMet": "Case competition",
+    "date": "2026-08-21",
+    "followUp": "2026-10-20"
+   }
+  ]
+ },
+ {
+  "file": "3-career-office.xls",
+  "desc": "Old .xls: Contact Name, Organization, Job Title, E-mail Address, Mobile, LinkedIn URL, Industry",
+  "people": [
+   {
+    "name": "Aisha Bello",
+    "firm": "Chime",
+    "role": "Product Lead",
+    "email": "aisha.bello@chime.com",
+    "phone": "(213) 555-0119",
+    "linkedin": "linkedin.com/in/aishabello",
+    "industry": "Fintech"
+   },
+   {
+    "name": "Tom Becker",
+    "firm": "Oliver Wyman",
+    "role": "Manager",
+    "email": "tbecker@oliverwyman.com",
+    "phone": "",
+    "linkedin": "linkedin.com/in/tombecker",
+    "industry": "Consulting"
+   }
+  ]
+ },
+ {
+  "file": "4-unusual-headers.xlsx",
+  "desc": "Unusual headers: Who I talked to / Where they're at now / What they do / Reach them / When (needs AI)",
+  "people": [
+   {
+    "name": "Grace Liu",
+    "firm": "Notion",
+    "role": "Designer",
+    "email": "grace.liu@notion.so",
+    "date": "2026-10-01"
+   },
+   {
+    "name": "Ben Carter",
+    "firm": "Meta",
+    "role": "Data Scientist",
+    "email": "bcarter@meta.com",
+    "date": "2026-09-12"
+   }
+  ]
+ },
+ {
+  "file": "5-no-names.xlsx",
+  "desc": "No people in it (event attendance counts): should refuse clearly",
+  "people": []
+ }
+]
