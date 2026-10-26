@@ -76,3 +76,31 @@ save_truth("5-no-names.xlsx", "No people in it (event attendance counts): should
 
 json.dump(truth, open(OUT / "truth.json", "w"), indent=1)
 print("made", len(truth))
+
+# 6. A normal tracker where some rows were typed as one sentence in the Name cell
+wb = openpyxl.Workbook(); ws = wb.active; ws.title = "Contacts"
+ws.append(["Name", "Company", "Email", "Notes"])
+ws.append(["Lena Park", "Airbnb", "lena.park@airbnb.com", "Design lead"])
+ws.append(["Met Jake Morales at the Bain info session, jake.morales@bain.com, follow up Friday", "", "", ""])
+ws.append(["Omar Haddad", "Stripe", "ohaddad@stripe.com", ""])
+ws.append(["coffee w/ Nina Shah (Deloitte, senior consultant) on 10/14 - promised to send my resume", "", "", ""])
+wb.save(OUT / "6-crammed-cells.xlsx")
+save_truth("6-crammed-cells.xlsx", "Normal tracker with two rows typed as one sentence in the Name cell (needs AI to split)",
+           [{"name": "Lena Park", "firm": "Airbnb", "email": "lena.park@airbnb.com"},
+            {"name": "Jake Morales", "firm": "Bain", "email": "jake.morales@bain.com"},
+            {"name": "Omar Haddad", "firm": "Stripe", "email": "ohaddad@stripe.com"},
+            {"name": "Nina Shah", "firm": "Deloitte", "role": "senior consultant", "date": "2026-10-14"}])
+
+# 7. No columns at all: a list of sentences, like notes pasted into Excel
+wb = openpyxl.Workbook(); ws = wb.active
+for line in ["Priya Raman - McKinsey associate, met at MCA kickoff, priya_raman@mckinsey.com",
+             "Talked to Sam Lee (Google PM) after the tech trek; send thank-you",
+             "Intro from Jen: Carlos Vega, BCG principal, cvega@bcg.com, (310) 555-0142"]:
+    ws.append([line])
+wb.save(OUT / "7-sentences-only.xlsx")
+save_truth("7-sentences-only.xlsx", "No header, each row a sentence about someone (needs AI)",
+           [{"name": "Priya Raman", "firm": "McKinsey", "email": "priya_raman@mckinsey.com"},
+            {"name": "Sam Lee", "firm": "Google"},
+            {"name": "Carlos Vega", "firm": "BCG", "email": "cvega@bcg.com"}])
+json.dump(truth, open(OUT / "truth.json", "w"), indent=1)
+print("now", len(truth))

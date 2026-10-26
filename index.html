@@ -1671,6 +1671,8 @@ function refineMap(rows, hi, map){
   // A header that names one field but holds another: record it so the preview can show both names
   return m;
 }
+const looksCrammed = s => { s = String(s || "").trim(); return /@|\d{3}|https?:|[,;|]/.test(s) || s.split(/\s+/).length > 5 || /\b(met|at|from|with|via|follow|intro|works?|coffee|call)\b/i.test(s) && s.split(/\s+/).length > 3; };
+const rowText = (head, r) => r.map((c, j) => { const v = c instanceof Date ? ymd(c) : String(c ?? "").trim(); if (!v) return ""; const h = String(head?.[j] ?? "").trim(); return h ? `${h}: ${v}` : v; }).filter(Boolean).join(" | ");
 function rowsToPeople(rows, hi, map){
   map = refineMap(rows, hi, map);
   const fromLinkedIn = rows[hi].some(c => normHead(c) === "connected on");
@@ -1679,7 +1681,10 @@ function rowsToPeople(rows, hi, map){
   let lastName = "";
   for (const r of rows.slice(hi + 1)){
     let name = String(get(r, "name") || [get(r, "first"), get(r, "last")].filter(Boolean).join(" ")).trim();
-    if (!name || /^(total|totals|sum|count|name|example|e\.g\.?)\b/i.test(name) || name.length > 80) continue;
+    if (!name || /^(total|totals|sum|count|name|example|e\.g\.?)\b/i.test(name)) continue;
+    // A whole note typed into the name cell ("Met Jake at Bain, jake@bain.com, follow up Fri"): the AI splits it later
+    if (looksCrammed(name)){ out.push({crammed:true, raw: rowText(rows[hi], r)}); lastName = ""; continue; }
+    if (name.length > 80) continue;
     if (name === lastName && !get(r, "email")) continue;   // a repeated row
     lastName = name;
     const last = toYmdLoose(get(r, "lastContact")), fu = toYmdLoose(get(r, "followUp"));
@@ -1720,20 +1725,64 @@ Reply with only JSON: {"headerRow": 0, "columns": {"name": -1, "first": -1, "las
     return {hi, map};
   }catch{ return null; }
 }
+// Sends rows that were typed as sentences to the AI, 20 at a time, and gets back separate fields for each person
+async function aiSplitRows(raws){
+  const out = new Map(); if (!sample || !raws.length) return out;
+  const chunks = []; for (let i = 0; i < raws.length; i += 20) chunks.push(raws.slice(i, i + 20).map((t, k) => [i + k, t]));
+  await Promise.all(chunks.map(async ch => {
+    try{
+      const r = await sample.json(`Each numbered line is one row from someone's networking spreadsheet, where the details were typed as free text instead of in separate columns. Today is ${today()} (${new Date().toLocaleDateString("en-US", {weekday:"long"})}).
+Split each row into the people it mentions. Rules: use only what is written; leave a field "" when it isn't there; never invent an email, company, or role. "date" is when they last talked or met (YYYY-MM-DD); "followUp" is a planned follow-up date (YYYY-MM-DD), so turn "follow up Friday" into the next Friday's date. "howMet" is the event or way they met ("Bain info session", "intro from Sam"). Put anything else useful (promises, personal details) in "notes". A row with no person's name gets "people": [].
+
+${ch.map(([i, t]) => `${i}. ${String(t).slice(0, 500)}`).join("\n")}
+
+Reply with only JSON: {"rows": [{"row": 0, "people": [{"name": "", "firm": "", "role": "", "email": "", "phone": "", "linkedin": "", "howMet": "", "date": "", "followUp": "", "notes": ""}]}]}`, {modelTier:"quick"});
+      for (const x of (r?.rows || [])) if (Number.isInteger(x?.row)) out.set(x.row, Array.isArray(x.people) ? x.people : []);
+    }catch{}
+  }));
+  return out;
+}
+const cleanSplit = p => { const d = s => /^\d{4}-\d{2}-\d{2}$/.test(String(s || "")) ? String(s) : "";
+  const em = String(p.email || "").trim(); const date = d(p.date);
+  return {name:String(p.name || "").trim(), firm:String(p.firm || "").trim(), role:String(p.role || "").trim(), email: looksEmail(em) ? em : "", phone:String(p.phone || "").trim(),
+    linkedin:String(p.linkedin || "").trim().replace(/^https?:\/\/(www\.)?/, "").replace(/[?#].*$/, "").replace(/\/$/, ""), industry:"", howMet:String(p.howMet || "").trim(), tags:[],
+    notes:String(p.notes || "").trim(), date: date && date <= today() ? date : "", followUp: d(p.followUp), split:true}; };
+async function finishSplit(res){
+  const raws = res.people.filter(p => p.crammed).map(p => p.raw);
+  if (!raws.length) return res;
+  const got = await aiSplitRows(raws);
+  let k = 0, failed = 0; const people = [];
+  for (const p of res.people){
+    if (!p.crammed){ people.push(p); continue; }
+    const ppl = got.get(k++);
+    if (ppl){ for (const x of ppl){ const c = cleanSplit(x); if (c.name && c.name.length <= 80 && !looksCrammed(c.name)) people.push(c); } }
+    else { failed++; const em = (p.raw.match(/[^\s@|,;()]+@[^\s@|,;()]+\.[a-z]{2,}/i) || [""])[0];   // no AI: keep the text so nothing is lost
+      people.push({name: p.raw.split(/[,;|(@]/)[0].replace(/^[^:]*:\s*/, "").trim().split(/\s+/).slice(0, 3).join(" "), firm:"", role:"", email:em, phone:"", linkedin:"", industry:"", howMet:"", tags:[], notes:p.raw, date:"", followUp:"", unsplit:true}); }
+  }
+  return {...res, people, splitCount: raws.length - failed, unsplitCount: failed};
+}
+// A sheet with no header where each row is a sentence about someone
+const looksFreeText = rows => { const col = rows.slice(0, 30).map(r => r.find(c => String(c ?? "").trim())).filter(Boolean);
+  return col.length >= 2 && col.filter(looksCrammed).length / col.length >= 0.6; };
 async function readContactRows(rows){
   rows = rows.filter(r => r.some(c => String(c ?? "").trim() !== ""));
   if (!rows.length) return {error:"That file looks empty."};
   let h = findHeader(rows), byAI = false;
+  if (!h && looksFreeText(rows)){
+    const res = {people: rows.map(r => ({crammed:true, raw: rowText([], r)})), fromLinkedIn:false, used:{notes:"each row's text"}};
+    if (!sample) return {error:"Each row is written as a sentence. Splitting sentences into names, companies, and emails needs AI, which isn't available here. Put names in their own column, or open NetWork inside Claude."};
+    return finishSplit(res);
+  }
   if (!h){ h = await aiMapColumns(rows); byAI = !!h; }
   if (!h) return {error: sample ? "Couldn't tell which column has names. Add a header row with “Name” (or “First Name” and “Last Name”) and try again."
                                 : "Couldn't find a name column. The file needs a header row with “Name”, or “First Name” and “Last Name”."};
-  return {...rowsToPeople(rows, h.hi, h.map), byAI};
+  return finishSplit({...rowsToPeople(rows, h.hi, h.map), byAI});
 }
 // Kept for CSV callers and tests
 function readContactsFile(text){
   const rows = parseCSV(text); const h = findHeader(rows);
   if (!h) return {error:"Couldn't find a name column. The file needs a header row with “Name”, or “First Name” and “Last Name”."};
-  return rowsToPeople(rows, h.hi, h.map);
+  const r = rowsToPeople(rows, h.hi, h.map); return {...r, people: r.people.filter(p => !p.crammed)};
 }
 // Excel support loads only when someone picks a spreadsheet file
 let xlsxLoading = null;
@@ -1809,7 +1858,10 @@ function drawImport(){
   out.innerHTML = `<div class="parsed">
       <div><b>${ppl.length} ${ppl.length === 1 ? "contact" : "contacts"}</b> in ${esc(importData.file)}${dup ? `, ${dup} already in NetWork (their empty fields get filled in)` : ""}.</div>
       ${importData.used ? `<div class="hint"><b>How each column was read${importData.byAI ? " (matched by AI, please check)" : ""}${importData.sheet ? ` from the “${esc(importData.sheet)}” tab` : ""}:</b> ${Object.entries(importData.used).map(([f, h]) => `${esc(h)} → ${esc(FIELD_LABEL[f] || f)}`).join(" · ")}</div>` : ""}
-      ${ppl.length ? `<div class="hint">${ppl.slice(0, 5).map(p => esc(p.name) + (p.firm ? " · " + esc(p.firm) : "") + (p.date ? " · last talked " + esc(fmtDate(p.date)) : "")).join("<br>")}${ppl.length > 5 ? `<br>and ${ppl.length - 5} more` : ""}</div>` : ""}
+      ${importData.splitCount ? `<div class="unsure-note">${importData.splitCount} ${importData.splitCount === 1 ? "row was" : "rows were"} written as sentences, so the AI split ${importData.splitCount === 1 ? "it" : "them"} into fields. Check ${importData.splitCount === 1 ? "it" : "them"} below (marked ✦).</div>` : ""}
+      ${importData.unsplitCount ? `<div class="unsure-note">${importData.unsplitCount} ${importData.unsplitCount === 1 ? "row is" : "rows are"} written as sentences and couldn't be split here; the full text is kept in notes.</div>` : ""}
+      ${(() => { const sp = ppl.filter(p => p.split || p.unsplit); return sp.length ? `<div class="hint">${sp.slice(0, 12).map(p => "✦ " + esc(p.name) + [p.firm, p.email, p.howMet && "met: " + p.howMet, p.date && "talked " + fmtDate(p.date), p.followUp && "follow up " + fmtDate(p.followUp)].filter(Boolean).map(x => " · " + esc(x)).join("")).join("<br>")}${sp.length > 12 ? `<br>and ${sp.length - 12} more` : ""}</div>` : ""; })()}
+      ${ppl.length ? `<div class="hint">${ppl.filter(p => !p.split && !p.unsplit).slice(0, 5).map(p => esc(p.name) + (p.firm ? " · " + esc(p.firm) : "") + (p.date ? " · last talked " + esc(fmtDate(p.date)) : "")).join("<br>")}${(() => { const n = ppl.filter(p => !p.split && !p.unsplit).length; return n > 5 ? `<br>and ${n - 5} more` : ""; })()}</div>` : ""}
       <label class="row" style="gap:8px"><input type="checkbox" id="impRemind" style="width:18px;height:18px;accent-color:var(--accent)"> Remind me to stay in touch with these people</label>
       <p class="hint">Off by default so a big import doesn't flood your to-do list. You can turn reminders on for anyone from their card.</p>
       <div class="row"><button class="btn primary" id="impGo" ${ppl.length ? "" : "disabled"}>Import ${ppl.length}</button><span class="status" id="impSt"></span></div></div>`;

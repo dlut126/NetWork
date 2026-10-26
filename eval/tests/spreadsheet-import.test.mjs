@@ -12,6 +12,12 @@ async function boot(withAI){
       w.eval(XLSRC);
       const sample = Object.assign(async()=>({text:""}), {json: async (p)=>{ prompts.push(p);
         // what a model would answer for file 4's header
+        if (p.includes("typed as free text")){   // stand-in for the model: split the known test sentences
+          const rows = [...p.matchAll(/^(\d+)\. (.*)$/gm)].map(m => ({row:Number(m[1]), text:m[2]}));
+          const known = [["Jake Morales","Bain","","jake.morales@bain.com","",""],["Nina Shah","Deloitte","senior consultant","","2026-10-14",""],
+            ["Priya Raman","McKinsey","associate","priya_raman@mckinsey.com","",""],["Sam Lee","Google","PM","","",""],["Carlos Vega","BCG","principal","cvega@bcg.com","",""]];
+          return {rows: rows.map(r => ({row:r.row, people: known.filter(k => r.text.includes(k[0])).map(k => ({name:k[0], firm:k[1], role:k[2], email:k[3], date:k[4], followUp:k[5]}))}))};
+        }
         if (p.includes("Attendance")) return {headerRow:0, columns:{name:-1, first:-1, last:-1, firm:-1, role:-1, email:-1, phone:-1, linkedin:-1, industry:-1, howMet:-1, lastContact:1, followUp:-1, tags:-1, notes:-1}};
         if (p.includes("Attendance") === false && p.includes("Tech Trek")) return {headerRow:0, columns:{name:0}};
         return {headerRow:0, columns:{name:0, first:-1, last:-1, firm:1, role:2, email:3, phone:-1, linkedin:-1, industry:-1, howMet:-1, lastContact:4, followUp:-1, tags:-1, notes:-1}}; }});
@@ -29,7 +35,9 @@ for (const withAI of [true, false]){
     const file = new w.File([buf], t.file);
     const r = await w.readAnyContactsFile(file);
     const bad = [];
-    if (!withAI && t.file.startsWith("4-")){ if (!r.error) bad.push("without AI this should ask for a Name header"); }
+    if (!withAI && t.file.startsWith("7-")){ if (!r.error) bad.push("without AI this should explain sentences need AI"); }
+    else if (!withAI && t.file.startsWith("6-")){ if (r.error || r.unsplitCount !== 2 || r.people.length !== 4) bad.push(`without AI should keep 4 rows with 2 unsplit, got ${r.error || r.people?.length + "/" + r.unsplitCount}`); }
+    else if (!withAI && t.file.startsWith("4-")){ if (!r.error) bad.push("without AI this should ask for a Name header"); }
     else if (!t.people.length){ if (!r.error) bad.push("should have refused, got " + (r.people||[]).length); }
     else if (r.error) bad.push("ERROR " + r.error);
     else {

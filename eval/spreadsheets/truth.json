@@ -103,5 +103,52 @@
   "file": "5-no-names.xlsx",
   "desc": "No people in it (event attendance counts): should refuse clearly",
   "people": []
+ },
+ {
+  "file": "6-crammed-cells.xlsx",
+  "desc": "Normal tracker with two rows typed as one sentence in the Name cell (needs AI to split)",
+  "people": [
+   {
+    "name": "Lena Park",
+    "firm": "Airbnb",
+    "email": "lena.park@airbnb.com"
+   },
+   {
+    "name": "Jake Morales",
+    "firm": "Bain",
+    "email": "jake.morales@bain.com"
+   },
+   {
+    "name": "Omar Haddad",
+    "firm": "Stripe",
+    "email": "ohaddad@stripe.com"
+   },
+   {
+    "name": "Nina Shah",
+    "firm": "Deloitte",
+    "role": "senior consultant",
+    "date": "2026-10-14"
+   }
+  ]
+ },
+ {
+  "file": "7-sentences-only.xlsx",
+  "desc": "No header, each row a sentence about someone (needs AI)",
+  "people": [
+   {
+    "name": "Priya Raman",
+    "firm": "McKinsey",
+    "email": "priya_raman@mckinsey.com"
+   },
+   {
+    "name": "Sam Lee",
+    "firm": "Google"
+   },
+   {
+    "name": "Carlos Vega",
+    "firm": "BCG",
+    "email": "cvega@bcg.com"
+   }
+  ]
  }
 ]
