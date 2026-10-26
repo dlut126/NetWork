@@ -826,6 +826,11 @@ ${text}`;
 }
 
 // A photo of a sign-up sheet, business card, name tags, or attendee list
+// The photo step, kept in one place so eval/photo-run.js tests exactly what the app runs.
+const PHOTO_PROMPT = `The user took this photo to add people to their networking contacts. It may show a sign-up sheet, attendee list, business card(s), name tags, or a slide with names. Extract every person whose name you can read clearly.
+Rules: include only names you can actually read, and skip rows you can't read rather than guessing. Never invent a company, role, or email; leave a field "" when it isn't written. If the page shows an event name or title, put it in "event".
+Reply with only JSON: {"event": "", "unreadable": 0, "people": [{"name": "", "firm": "", "role": "", "email": "", "phone": "", "linkedin": "", "notes": "anything else written next to them"}]}`;
+async function extractPhoto(file){ return sample.json(PHOTO_PROMPT, {images:file}); }
 async function runPhoto(u, file){
   const st = $("#"+u+"-st");
   quickContext = $("#"+u+"-ctx").value.trim();
@@ -836,9 +841,7 @@ async function runPhoto(u, file){
   const {list} = buildNetwork();
   const real = list.filter(e => !e.example);
   try{
-    const r = await sample.json(`The user took this photo to add people to their networking contacts. It may show a sign-up sheet, attendee list, business card(s), name tags, or a slide with names. Extract every person whose name you can read clearly.
-Rules: include only names you can actually read, and skip rows you can't read rather than guessing. Never invent a company, role, or email; leave a field "" when it isn't written. If the page shows an event name or title, put it in "event".
-Reply with only JSON: {"event": "", "unreadable": 0, "people": [{"name": "", "firm": "", "role": "", "email": "", "phone": "", "linkedin": "", "notes": "anything else written next to them"}]}`, {images:file});
+    const r = await extractPhoto(file);
     const ppl = (r?.people||[]).filter(p => p && String(p.name||"").trim());
     if (!ppl.length){ st.className = "status err"; st.textContent = "Couldn't read any names in that photo. Try a sharper, closer photo with good light."; return; }
     const where = quickContext || String(r.event || "").trim();

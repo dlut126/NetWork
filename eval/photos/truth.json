@@ -1,0 +1,676 @@
+[
+ {
+  "id": 1,
+  "file": "sheet-01.jpg",
+  "desc": "Clean printed table, good light",
+  "event": "Product Management Club · Fall Mixer",
+  "people": [
+   {
+    "name": "Hannah Brooks",
+    "firm": "Notion",
+    "email": "hbrooks@gmail.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Omar Siddiqui",
+    "firm": "Amazon",
+    "email": "omar.siddiqui@anderson.ucla.edu",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Grace Liu",
+    "firm": "Stripe",
+    "email": "grace.liu@stripe.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Diego Ramirez",
+    "firm": "Deloitte",
+    "email": "dramirez@outlook.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Priya Nair",
+    "firm": "Salesforce",
+    "email": "priya.nair@salesforce.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Ben Carter",
+    "firm": "Meta",
+    "email": "bcarter@meta.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Lauren Kim",
+    "firm": "Figma",
+    "email": "lauren.kim@gmail.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Marcus Hill",
+    "firm": "Adobe",
+    "email": "mhill@adobe.com",
+    "phone": "",
+    "linkedin": ""
+   }
+  ],
+  "should_skip": []
+ },
+ {
+  "id": 2,
+  "file": "sheet-02.jpg",
+  "desc": "Neat handwriting, one writer's style per row",
+  "event": "Consulting Club Coffee Chats — sign in",
+  "people": [
+   {
+    "name": "Ethan Walsh",
+    "firm": "Bain",
+    "email": "ethanwalsh@gmail.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Sofia Rossi",
+    "firm": "BCG",
+    "email": "srossi@bcg.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Kevin Tran",
+    "firm": "McKinsey",
+    "email": "ktran@mckinsey.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Maya Patel",
+    "firm": "EY-Parthenon",
+    "email": "maya.p@ey.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Jordan Lee",
+    "firm": "Accenture",
+    "email": "jordanlee22@yahoo.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Rachel Adams",
+    "firm": "Kearney",
+    "email": "radams@kearney.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Tom Becker",
+    "firm": "Oliver Wyman",
+    "email": "tbecker@oliverwyman.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Nina Shah",
+    "firm": "L.E.K.",
+    "email": "nshah@lek.com",
+    "phone": "",
+    "linkedin": ""
+   }
+  ],
+  "should_skip": []
+ },
+ {
+  "id": 3,
+  "file": "sheet-03.jpg",
+  "desc": "Mixed handwriting, tilted and photographed at an angle",
+  "event": "Tech Trek Info Session",
+  "people": [
+   {
+    "name": "Alex Morgan",
+    "firm": "Google",
+    "email": "amorgan@google.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Chloe Bennett",
+    "firm": "Airbnb",
+    "email": "chloe.b@airbnb.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Raj Malhotra",
+    "firm": "Nvidia",
+    "email": "rmalhotra@nvidia.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Emily Zhang",
+    "firm": "Microsoft",
+    "email": "emzhang@microsoft.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Sam O'Connor",
+    "firm": "Uber",
+    "email": "soconnor@uber.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Isabel Cruz",
+    "firm": "Apple",
+    "email": "icruz@apple.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Derek Johnson",
+    "firm": "Snowflake",
+    "email": "derek.johnson@snowflake.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Fatima Ali",
+    "firm": "Datadog",
+    "email": "fali@datadoghq.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Liam Murphy",
+    "firm": "LinkedIn",
+    "email": "lmurphy@linkedin.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Zoe Park",
+    "firm": "Pinterest",
+    "email": "zpark@pinterest.com",
+    "phone": "",
+    "linkedin": ""
+   }
+  ],
+  "should_skip": []
+ },
+ {
+  "id": 4,
+  "file": "sheet-04.jpg",
+  "desc": "Blanks: some people skipped email or company",
+  "event": "Healthcare Business Assoc. — Panel Night",
+  "people": [
+   {
+    "name": "Victoria Hayes",
+    "firm": "Kaiser Permanente",
+    "email": "vhayes@kp.org",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Andre Wilson",
+    "firm": "",
+    "email": "andrew.wilson88@gmail.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Mei Chen",
+    "firm": "Genentech",
+    "email": "",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Carlos Mendez",
+    "firm": "",
+    "email": "",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Hope",
+    "firm": "",
+    "email": "",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Daniel Osei",
+    "firm": "Johnson & Johnson",
+    "email": "dosei@its.jnj.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Laura Fischer",
+    "firm": "Medtronic",
+    "email": "",
+    "phone": "",
+    "linkedin": ""
+   }
+  ],
+  "should_skip": []
+ },
+ {
+  "id": 5,
+  "file": "sheet-05.jpg",
+  "desc": "A crossed-out entry rewritten below, and one scribbled, unreadable row",
+  "event": "Entertainment & Media Club Sign-Up",
+  "people": [
+   {
+    "name": "Jasmine Reed",
+    "firm": "Netflix",
+    "email": "jreed@netflix.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Tyler Grant",
+    "firm": "Disney",
+    "email": "tgrant@disney.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Olivia Martinez",
+    "firm": "Warner Bros. Discovery",
+    "email": "omartinez@wbd.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Noah Kim",
+    "firm": "Spotify",
+    "email": "noah.kim@spotify.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Ava Thompson",
+    "firm": "Paramount",
+    "email": "ava.thompson@paramount.com",
+    "phone": "",
+    "linkedin": ""
+   }
+  ],
+  "should_skip": [
+   "Tyler Grant",
+   "Xqzv Ttrrw"
+  ]
+ },
+ {
+  "id": 6,
+  "file": "sheet-06.jpg",
+  "desc": "Dim, blurry, noisy phone photo",
+  "event": "Real Estate Club — Site Visit RSVP",
+  "people": [
+   {
+    "name": "Brandon Scott",
+    "firm": "CBRE",
+    "email": "bscott@cbre.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Hailey Nguyen",
+    "firm": "JLL",
+    "email": "hnguyen@jll.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Marco Bianchi",
+    "firm": "Blackstone",
+    "email": "mbianchi@blackstone.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Tiffany Wu",
+    "firm": "Prologis",
+    "email": "twu@prologis.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Josh Feldman",
+    "firm": "Related",
+    "email": "jfeldman@related.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Kayla Brown",
+    "firm": "Hines",
+    "email": "kbrown@hines.com",
+    "phone": "",
+    "linkedin": ""
+   }
+  ],
+  "should_skip": []
+ },
+ {
+  "id": 7,
+  "file": "sheet-07.jpg",
+  "desc": "Different columns: company first, phone and LinkedIn",
+  "event": "Fintech Club Founders Breakfast",
+  "people": [
+   {
+    "name": "Elena Petrova",
+    "firm": "Ramp",
+    "email": "",
+    "phone": "(415) 555-0142",
+    "linkedin": "linkedin.com/in/elenapetrova"
+   },
+   {
+    "name": "Chris Doyle",
+    "firm": "Plaid",
+    "email": "",
+    "phone": "650-555-0187",
+    "linkedin": "linkedin.com/in/chrisdoyle"
+   },
+   {
+    "name": "Aisha Bello",
+    "firm": "Chime",
+    "email": "",
+    "phone": "(213) 555-0119",
+    "linkedin": ""
+   },
+   {
+    "name": "Ryan Cho",
+    "firm": "Brex",
+    "email": "",
+    "phone": "",
+    "linkedin": "linkedin.com/in/ryancho"
+   },
+   {
+    "name": "Megan Foster",
+    "firm": "Robinhood",
+    "email": "",
+    "phone": "310-555-0166",
+    "linkedin": "linkedin.com/in/meganfoster"
+   }
+  ],
+  "should_skip": []
+ },
+ {
+  "id": 8,
+  "file": "sheet-08.jpg",
+  "desc": "Long sheet: 20 people",
+  "event": "Women in Business — Annual Kickoff",
+  "people": [
+   {
+    "name": "Abigail Turner",
+    "firm": "Goldman Sachs",
+    "email": "aturner@gmail.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Brianna Lopez",
+    "firm": "J.P. Morgan",
+    "email": "blopez@jpmorgan.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Camila Reyes",
+    "firm": "PwC",
+    "email": "creyes@pwc.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Dana Whitfield",
+    "firm": "KPMG",
+    "email": "dwhitfield@kpmg.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Erin O'Neill",
+    "firm": "Nike",
+    "email": "eoneill@nike.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Fiona Grant",
+    "firm": "L'Oréal",
+    "email": "fgrant@loreal.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Gabriela Santos",
+    "firm": "P&G",
+    "email": "gsantos@pg.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Heather Lin",
+    "firm": "Visa",
+    "email": "hlin@visa.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Ivy Chen",
+    "firm": "",
+    "email": "ivy.chen@gmail.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Julia Novak",
+    "firm": "Tesla",
+    "email": "jnovak@tesla.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Kara Mitchell",
+    "firm": "Hulu",
+    "email": "kmitchell@hulu.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Leah Goldberg",
+    "firm": "Bain",
+    "email": "lgoldberg@bain.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Monica Alvarez",
+    "firm": "Target",
+    "email": "malvarez@target.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Natalie Brooks",
+    "firm": "IBM",
+    "email": "nbrooks@ibm.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Paige Ellis",
+    "firm": "Intuit",
+    "email": "pellis@intuit.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Quinn Harper",
+    "firm": "",
+    "email": "qharper@yahoo.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Riley Evans",
+    "firm": "Oracle",
+    "email": "revans@oracle.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Sara Haddad",
+    "firm": "Cisco",
+    "email": "shaddad@cisco.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Tessa Morgan",
+    "firm": "Lyft",
+    "email": "tmorgan@lyft.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Uma Krishnan",
+    "firm": "Deloitte",
+    "email": "ukrishnan@deloitte.com",
+    "phone": "",
+    "linkedin": ""
+   }
+  ],
+  "should_skip": []
+ },
+ {
+  "id": 9,
+  "file": "sheet-09.jpg",
+  "desc": "International names with accents",
+  "event": "Global Business Club Welcome Night",
+  "people": [
+   {
+    "name": "José Muñoz",
+    "firm": "Santander",
+    "email": "jmunoz@santander.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Siobhán Ní Bhriain",
+    "firm": "Accenture",
+    "email": "siobhan.nb@gmail.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Łukasz Nowak",
+    "firm": "Allegro",
+    "email": "lnowak@allegro.pl",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Nguyễn Thị Lan",
+    "firm": "VNG",
+    "email": "lan.nguyen@vng.com.vn",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Zoë Müller",
+    "firm": "Siemens",
+    "email": "zoe.mueller@siemens.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Aarav Gupta",
+    "firm": "Infosys",
+    "email": "aarav.gupta@infosys.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Chidi Okeke",
+    "firm": "Flutterwave",
+    "email": "cokeke@flutterwave.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Yuki Tanaka",
+    "firm": "Sony",
+    "email": "ytanaka@sony.co.jp",
+    "phone": "",
+    "linkedin": ""
+   }
+  ],
+  "should_skip": []
+ },
+ {
+  "id": 10,
+  "file": "sheet-10.jpg",
+  "desc": "Free-form notebook page, no table, messy",
+  "event": "Marketing Assoc. — Brand Teardown (10/22)",
+  "people": [
+   {
+    "name": "Jake Peterson",
+    "firm": "Coca-Cola",
+    "email": "jake.p@gmail.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Ana Silva",
+    "firm": "Unilever",
+    "email": "asilva@unilever.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Kris Patel",
+    "firm": "Patel Studio",
+    "email": "kris@patelstudio.co",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Morgan Yates",
+    "firm": "HubSpot",
+    "email": "myates@hubspot.com",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Lena Park",
+    "firm": "",
+    "email": "",
+    "phone": "",
+    "linkedin": ""
+   },
+   {
+    "name": "Theo Russo",
+    "firm": "Red Bull",
+    "email": "trusso@redbull.com",
+    "phone": "",
+    "linkedin": ""
+   }
+  ],
+  "should_skip": []
+ }
+]
