@@ -1163,8 +1163,8 @@ THEIR CONTACTS (one per line; the key= value identifies each):
 ${lines || "(no contacts yet)"}
 
 Do three things:
-1. "matches": contacts who directly fit (e.g. work at the company named, or have the role asked about). Only real fits based on the details given; never guess. Up to 8, best first, each with a short "why".
-2. "introducers": contacts who don't fit directly but could plausibly introduce the user to someone who does: same industry, worked there before, the notes say they know people there, or a strong connector (alumni, mentor). Up to 4, each with a short "why" naming the specific reason. Empty if none.
+1. "matches": contacts who directly fit (e.g. work at the company named, or have the role asked about). Only real fits based on the details given; never guess. Up to 8, best first, each with a "why" of at most 12 words (e.g. "Associate at McKinsey; offered to run a practice case").
+2. "introducers": contacts who don't fit directly but could plausibly introduce the user to someone who does: same industry, worked there before, the notes say they know people there, or a strong connector (alumni, mentor). Up to 4, each with a "why" of at most 12 words naming the specific reason. Empty if none. Never put brackets, placeholders, or instructions to the user in a "why".
 3. Searches for finding NEW people: "linkedin" is 2-3 LinkedIn people-search keyword strings (plain keywords like "Bain San Francisco Stanford", no quotes or operators; when the request says "my school" or "alumni", use the school from the user's profile), each with a short "label". "google" is 1-2 Google queries that search LinkedIn profiles, using site:linkedin.com/in and quoted terms, each with a short "label".
 Add a one-sentence "tip" on how to reach out to people found this way.
 
