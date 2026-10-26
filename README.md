@@ -49,7 +49,7 @@ Built for an MBA course on designing useful AI solutions (final build). It's des
 
 **Network**
 - **Follow-up rules based on how you met.** Meet someone in person and you get a reminder to send a nice-to-meet-you email the next day; after a video call, a thank-you note; after an intro, a reply to the intro. Online-only connections owe nothing. Logging an email or text clears the reminder. You can also add your own to-dos to anyone.
-- **Find people.** Ask in plain English ("who do I know in fintech?", "alumni from my school at Bain SF"). It searches your contacts' companies, notes, history, and personal details, suggests who could introduce you, and writes LinkedIn and Google searches for finding new people.
+- **Get an intro.** Type who you want to meet ("someone at Stripe", "product managers in fintech") on Today. It instantly shows who you already know there and who could introduce you (same industry, worked there before, or your notes say they know people), then the AI refines it. Tap **Ask for an intro** and it drafts the request with a short blurb they can forward. Tap **I sent it** and it logs the ask and reminds you to follow up in a week. Works without the AI too (instant matches and a starter template).
 - **One box to add people.** Type a name and it saves instantly. Type or dictate a sentence ("At the tech night I met Sarah... then Tom from Bain...") and the AI fills in each person for you to confirm. Mention someone already in your contacts ("had coffee with Jen, she's moving to NYC") and it logs the conversation instead.
 - **Add people from a photo.** Snap a sign-up sheet, attendee list, business card, or name tags and everyone on it is added. For groups larger than five, follow-up reminders stay off so your to-do list doesn't flood.
 - **Group email.** Write one email to a group (everyone from an event, a company, or a tag). NetWork fills in each person's name and company, and can add one personal line per person from what you know about them. Copy each one, or, with Gmail connected, create a ready-to-send draft for each person. Nothing is ever sent automatically.
@@ -142,6 +142,9 @@ flowchart TD
   D --> H3(["👤 Edit, copy, and send it yourself"])
   C --> G["Group email: one message,<br/>name + company + AI personal line"]
   G --> H4(["👤 Review each email → copy, or create Gmail drafts<br/>(never sent automatically)"])
+  C --> I["Get an intro: who you know there + who could introduce you"]
+  I --> ID["AI drafts the intro ask + forwardable blurb"]
+  ID --> H6(["👤 Edit, copy, send yourself → I sent it logs it + follow-up in 7 days"])
   C --> P["Coffee chat prep → notes/transcript → AI debrief + thank-you"]
   P --> H5(["👤 Review, edit, send"])
 ```
@@ -154,6 +157,7 @@ flowchart TD
 | Who should I follow up with, and when? | Rules (how you met, promises, cadence, meetings) | Max 3 at a time; **Not now** on everything; per-person "stay in touch" setting |
 | What should the message say? | AI | **Person edits and sends**; the app never sends |
 | Group email to 30 people | Person writes it, AI adds personal lines | Preview and edit each one; Gmail drafts only, behind a confirm step; no duplicates |
+| Who could introduce me to someone at X? | Instant rules (company, notes, industry) + AI | Shown as suggestions with the reason; the person picks who to ask, edits the draft, and sends it |
 | Read my email or calendar? | Person | Off by default; Claude permission prompt; reads only who and when, never message content |
 
 ## Evaluation
@@ -165,6 +169,6 @@ See [docs/evaluation.md](docs/evaluation.md) for the full results. In short: the
 - Weekly reminder outside the app (email or notification) with that week's three people and drafted messages
 - Live web lookup in the hosted version, so the AI can fill in details about smaller companies
 - Event prep: paste an attendee list to see who you already know and who to meet
-- Give-back log and suggested intros between your own contacts
+- Give-back log: suggest intros between your own contacts
 - Recruiting pipeline view per company
 - Sync across devices for the hosted version

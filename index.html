@@ -581,7 +581,7 @@ function renderSide(){
   const listScroll = $(".clist")?.scrollTop || 0;
   side.innerHTML = `
     <div class="side-head"><div class="brand">Net<b>Work</b></div>
-      <div class="row" style="gap:8px"><button class="icon-btn me-btn" id="meBtn" aria-label="About you" title="About you">${hasMe() ? esc(initials(me.name)) : `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>`}</button><button class="icon-btn" id="findBtnSide" aria-label="Find people" title="Find people"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+      <div class="row" style="gap:8px"><button class="icon-btn me-btn" id="meBtn" aria-label="About you" title="About you">${hasMe() ? esc(initials(me.name)) : `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>`}</button><button class="icon-btn" id="findBtnSide" aria-label="Get an intro" title="Get an intro"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
       <button class="icon-btn primary" id="addBtn" aria-label="Add a contact" title="Add a contact">+</button></div></div>
     <div class="search"><input id="search" type="search" placeholder="Search ${list.length} contacts" aria-label="Search contacts"></div>
     <div class="filters">
@@ -673,6 +673,8 @@ function renderToday(m){
     </div>
     ${calTodayHTML()}
     <div class="section capture">${captureHTML("tq")}</div>
+    <div class="section"><h2>Get an intro</h2>
+      <div class="add-line"><input id="introIn" placeholder="Who do you want to meet? e.g. someone at Stripe" aria-label="Who do you want to meet?"><button class="btn" id="introGo">Find</button></div></div>
     ${usingExamples ? `<div class="section"><p class="hint">You're looking at example contacts. Add your first person and your own network replaces them.</p></div>` : ""}`;
   bindBack({type:"home"});
   $("#todayAdd").onclick = () => go({type:"add"});
@@ -689,6 +691,8 @@ function renderToday(m){
   m.querySelectorAll("[data-fine]").forEach(b => b.onclick = () => { const p = ensurePerson(findEntry(b.dataset.fine)); p.complete = true; persist(p, 0); render(); });
   const ta = $("#todoAll"); if (ta) ta.onclick = () => { sel = {...sel, showAll:!showAll}; renderMain(); };
   bindCapture("tq");
+  const ii = $("#introIn"), ig = () => { const v = ii.value.trim(); if (!v){ ii.focus(); return; } findQuery = v; go({type:"find"}); if (sample) runFind(); };
+  $("#introGo").onclick = ig; ii.addEventListener("keydown", ev => { if (ev.key === "Enter"){ ev.preventDefault(); ig(); } });
 }
 
 // ---------- Add (one box: a name, a sentence, or a photo) ----------
@@ -998,82 +1002,181 @@ function savePerson(d, matchKey, replaceAll, statusId, noPersist){
   return p;
 }
 
-// ---------- Find people ----------
+// ---------- Get an intro (find people + who could introduce you + draft the ask) ----------
 let findQuery = "", findResult = null, findBusy = false;
+const introState = new Map();      // contact key -> {busy, draft, note, sent}
+const FIND_STOP = new Set([...NAME_STOP, "do","know","anyone","someone","somebody","people","person","want","wanna","meet","get","intro","introduction","into","can","could","me","whos","works","working","any","there","contacts","contact","network","find","like","be","introduced","connect","help","them","someone's","who's","does","which","of","or","should","would","talk"]);
+const stemW = w => (w.length > 3 && w.endsWith("s") && !w.endsWith("ss")) ? w.slice(0, -1) : w;
+const wordsOf = s => new Set(String(s||"").toLowerCase().split(/[^\p{L}\p{N}&]+/u).filter(Boolean).map(stemW));
+function findTerms(q){ return [...new Set(String(q||"").toLowerCase().split(/[^\p{L}\p{N}&]+/u).filter(w => w.length > 1 && !FIND_STOP.has(w)).map(stemW))]; }
+function introTopic(q){
+  const t = String(q||"").trim().replace(/[?.!]+$/, "")
+    .replace(/^(who (do|does) (i|we) know|do i know anyone|i want to meet|i'd like to meet|help me meet|get (me )?an intro(duction)? to|find|anyone|someone|somebody|people)\s*/i, "").trim();
+  return t || String(q||"").trim();
+}
+// Instant, no-AI matching: a contact "matches" when a search word is in their company; they "could introduce you"
+// when the word shows up in their role, industry, notes, tags, or how you met (they know the space or the people).
+function localFind(q, list){
+  const terms = findTerms(q); if (!terms.length) return {matches:[], introducers:[]};
+  const matches = [], introducers = [];
+  for (const e of list){
+    const firm = wordsOf(e.firm);
+    const fields = [["role", e.role], ["industry", e.industry], ["notes", e.notes], ["how you met", e.howMet], ["tags", (e.tags||[]).join(" ")], ["what you remember", (e.remember||[]).join(" ")]];
+    const firmHits = terms.filter(t => firm.has(t));
+    const otherHits = fields.filter(([, v]) => terms.some(t => wordsOf(v).has(t)));
+    if (firmHits.length) matches.push({key:e.key, score:firmHits.length * 2 + otherHits.length, why:`Works at ${e.firm}`});
+    else if (otherHits.length){
+      const hitWords = terms.filter(t => fields.some(([, v]) => wordsOf(v).has(t)));
+      if (hitWords.length >= Math.min(terms.length, 2) || terms.length === 1)
+        introducers.push({key:e.key, score:hitWords.length, why:`“${hitWords.join(", ")}” is in their ${otherHits.map(x => x[0]).join(" and ")}`});
+    }
+  }
+  const by = (a, b) => b.score - a.score;
+  return {matches:matches.sort(by).slice(0, 8), introducers:introducers.sort(by).slice(0, 4), local:true};
+}
 function renderFind(m){
   const {list, usingExamples} = buildNetwork();
   m.innerHTML = `<div class="pane-head">${backBtn("Contacts", true)}<span class="spacer"></span></div>
-    <div class="section"><h1>Find people</h1>
-      <p class="hint">Ask in plain English. It searches your contacts (companies, notes, history, and what you've saved to remember), suggests who could introduce you, and writes LinkedIn and Google searches for finding new people.</p>
-      <div class="add-line"><input id="findIn" placeholder="Alumni from my school at Bain in San Francisco" aria-label="Who are you looking for?"><button class="btn primary" id="findBtn">${findBusy ? "Searching…" : "Search"}</button></div>
-      <div class="chips">${["Who do I know in consulting?","Alumni from my school in fintech","Who mentioned running?","Product managers at Google"].map(x => `<button type="button" class="chip" data-ex="${esc(x)}">${esc(x)}</button>`).join("")}</div>
-      <span class="status" id="findSt">${sample ? "" : "Smart search needs Claude, which isn't available here. Use the search box above the contact list instead."}</span>
-      ${usingExamples ? `<p class="hint">You only have example contacts so far, so "in your network" results will be thin. The LinkedIn and Google searches still work.</p>` : ""}
+    <div class="section"><h1>Get an intro</h1>
+      <p class="hint">Name a company, a role, or a kind of person. NetWork shows who you already know there and who could introduce you, then writes the ask.</p>
+      <div class="add-line"><input id="findIn" placeholder="Someone at Stripe" aria-label="Who do you want to meet?"><button class="btn primary" id="findBtn">${findBusy ? "Searching…" : "Find"}</button></div>
+      <div class="chips">${["Who do I know at Stripe?","Product managers in fintech","Someone in consulting","Who mentioned running?"].map(x => `<button type="button" class="chip" data-ex="${esc(x)}">${esc(x)}</button>`).join("")}</div>
+      <span class="status" id="findSt">${sample ? "" : "Quick search only here (AI search isn't available)."}</span>
+      ${usingExamples ? `<p class="hint">You're searching the example contacts. Once you add your own, it searches yours.</p>` : ""}
     </div>
     <div id="findOut"></div>`;
   bindBack({type:"home"});
   const inp = $("#findIn"); inp.value = findQuery;
-  const run = () => { findQuery = inp.value.trim(); if (findQuery) runFind(); };
-  $("#findBtn").disabled = !sample || findBusy;
+  const run = () => { findQuery = inp.value.trim(); if (!findQuery) return; if (sample) runFind(); else drawFind(buildNetwork().list); };
+  $("#findBtn").disabled = findBusy;
   $("#findBtn").onclick = run;
   inp.addEventListener("keydown", ev => { if (ev.key === "Enter"){ ev.preventDefault(); run(); } });
   m.querySelectorAll("[data-ex]").forEach(b => b.onclick = () => { inp.value = b.dataset.ex; run(); });
   if (!findQuery) inp.focus();
   drawFind(list);
 }
+const drawFindNow = () => { if (sel.type === "find") drawFind(buildNetwork().list); };
 function drawFind(list){
-  const out = $("#findOut"); if (!out || !findResult || findResult.q !== findQuery) { if (out) out.innerHTML = ""; return; }
-  const r = findResult.data;
+  const out = $("#findOut"); if (!out) return;
+  if (!findQuery){ out.innerHTML = ""; return; }
+  const ai = findResult && findResult.q === findQuery ? findResult.data : null;
+  const loc = localFind(findQuery, list);
   const byKey = new Map(list.map(e => [e.key, e]));
-  const personRow = (x) => { const e = byKey.get(x.key); if (!e) return ""; return `<button class="todo-main find-row" data-open="${esc(e.key)}">${avatar(e.name)}<span style="min-width:0"><span class="cname">${esc(e.name)}</span> <span class="csub">${esc([e.role, e.firm].filter(Boolean).join(" · "))}</span><br><span class="hint">${esc(x.why||"")}</span></span></button>`; };
-  const li = (r.linkedin||[]).filter(x => x?.keywords), gg = (r.google||[]).filter(x => x?.query);
+  // AI result when we have it; quick matches it missed are kept so nothing obvious disappears
+  const merge = (a, b) => { const seen = new Set(); return [...(a||[]), ...(b||[])].filter(x => x && byKey.has(x.key) && !seen.has(x.key) && seen.add(x.key)); };
+  const matches = ai ? merge(ai.matches, loc.matches) : loc.matches;
+  const mk = new Set(matches.map(x => x.key));
+  const intros = (ai ? merge(ai.introducers, loc.introducers) : loc.introducers).filter(x => !mk.has(x.key)).slice(0, 5);
+  const topic = introTopic(findQuery);
+  const row = (x, direct) => { const e = byKey.get(x.key); const st = introState.get(e.key);
+    return `<div class="find-row"><div class="todo">
+      <button class="todo-main" data-open="${esc(e.key)}">${avatar(e.name)}<span style="min-width:0"><span class="cname">${esc(e.name)}</span> <span class="csub">${esc([e.role, e.firm].filter(Boolean).join(" · "))}</span><br><span class="hint">${esc(x.why||"")}</span></span></button>
+      <div class="todo-acts"><button class="btn small ${direct ? "" : "primary"}" data-intro="${esc(e.key)}" ${st?.busy ? "disabled" : ""}>${st?.busy ? "Writing…" : direct ? "Ask them" : "Ask for an intro"}</button></div></div>
+      ${st?.draft ? `<div class="draft" style="margin-top:8px"><span class="label">${esc(st.draft.channel || "Message")} to ${esc(e.name.split(" ")[0])}${st.note ? ` · ${esc(st.note)}` : ""}</span>
+        <div class="draft-text" contenteditable="true" data-dtext="${esc(e.key)}">${st.draft.subject ? `<b>${esc(st.draft.subject)}</b>\n\n` : ""}${esc(st.draft.message)}</div>
+        <div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn small primary" data-icopy="${esc(e.key)}">Copy</button>
+          ${e.example ? `<span class="hint">Example contact: add your own to track the ask.</span>` : st.sent ? `<span class="hint">Logged. You'll get a reminder to follow up in a week.</span>` : `<button class="btn small" data-isent="${esc(e.key)}" title="Log it and remind me to follow up">I sent it</button>`}
+          <button class="btn small" data-idrop="${esc(e.key)}">Discard</button></div></div>` : ""}</div>`; };
+  const terms = findTerms(findQuery).join(" ");
+  const li = ai ? (ai.linkedin||[]).filter(x => x?.keywords) : (terms ? [{label:terms, keywords:terms}] : []);
+  const gg = ai ? (ai.google||[]).filter(x => x?.query) : [];
   out.innerHTML = `
-    <div class="section"><h2>In your network</h2>
-      ${(r.matches||[]).filter(x => byKey.has(x.key)).map(personRow).join("") || `<p class="hint">No one in your contacts matches.</p>`}</div>
-    ${(r.introducers||[]).filter(x => byKey.has(x.key)).length ? `<div class="section"><h2>Could introduce you</h2>${r.introducers.filter(x => byKey.has(x.key)).map(personRow).join("")}</div>` : ""}
-    <div class="section"><h2>Find new people</h2>
-      <p class="hint">These open in a new tab. LinkedIn shows the most when you're signed in. Add anyone good with “Just met someone” and choose Online.</p>
+    ${findBusy ? `<div class="section"><p class="hint">Quick matches below. Searching notes and history with AI…</p></div>` : ""}
+    <div class="section"><h2>You know someone there</h2>
+      ${matches.map(x => row(x, true)).join("") || `<p class="hint">No one in your contacts matches “${esc(topic)}”.</p>`}</div>
+    <div class="section"><h2>Could introduce you</h2>
+      ${intros.map(x => row(x, false)).join("") || `<p class="hint">No obvious connectors. Try a broader search (an industry instead of a company), or use the searches below.</p>`}</div>
+    ${li.length || gg.length ? `<div class="section"><h2>Find new people</h2>
+      <p class="hint">Opens in a new tab. Add anyone good with “Who did you meet?” and choose Online.</p>
       <div class="search-links">
         ${li.map(x => `<a class="btn small" target="_blank" rel="noopener" href="https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(x.keywords)}">LinkedIn: ${esc(x.label || x.keywords)}</a>`).join("")}
         ${gg.map(x => `<a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/search?q=${encodeURIComponent(x.query)}">Google: ${esc(x.label || x.query)}</a>`).join("")}
-      </div>
-      ${r.tip ? `<p class="hint">${esc(r.tip)}</p>` : ""}</div>`;
+      </div>${ai?.tip ? `<p class="hint">${esc(ai.tip)}</p>` : ""}</div>` : ""}`;
   out.querySelectorAll("[data-open]").forEach(b => b.onclick = () => go({type:"person", key:b.dataset.open}));
+  out.querySelectorAll("[data-intro]").forEach(b => b.onclick = () => { const e = byKey.get(b.dataset.intro); if (e) draftIntro(e, mk.has(e.key)); });
+  out.querySelectorAll("[data-icopy]").forEach(b => b.onclick = async () => {
+    const el = out.querySelector(`[data-dtext="${CSS.escape(b.dataset.icopy)}"]`); const st = introState.get(b.dataset.icopy);
+    const txt = el ? el.innerText.trim() : st?.draft?.message || "";
+    if (st?.draft) st.draft = {...st.draft, subject:"", message:txt};
+    try{ await navigator.clipboard.writeText(txt); b.textContent = "Copied"; }
+    catch{ const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "Selected"; }
+  });
+  out.querySelectorAll("[data-isent]").forEach(b => b.onclick = () => {
+    const e = byKey.get(b.dataset.isent); const st = introState.get(e.key); const p = ensurePerson(e);
+    addLog(p, {kind:"Reached out", note:`Asked for an intro to ${introPhrase(topic)}`});
+    addOwe(p, `Follow up on your intro request (${introPhrase(topic)})`, 7, false);
+    persist(p, 0); st.sent = true; renderSide(); drawFindNow();
+  });
+  out.querySelectorAll("[data-idrop]").forEach(b => b.onclick = () => { introState.delete(b.dataset.idrop); drawFindNow(); });
+}
+const introPhrase = t => /^(at|in|from|with)\b/i.test(t) ? "someone " + t : t;
+function introTemplate(e, topic, direct){
+  const f = e.name.split(" ")[0], t = /^(at|in|from|who|with)\b/i.test(topic) ? topic : "in " + topic;
+  const body = direct
+    ? `Hi ${f},\n\nHope you're doing well. I'm exploring roles ${t} and you were the first person I thought of. Would you have 15 minutes to tell me about your team? And if there's someone else you think I should talk to, I'd be grateful for an intro.\n\nThanks so much,\n${meFirst() || "[Your name]"}`
+    : `Hi ${f},\n\nHope you're doing well. I'm hoping to talk with someone ${t}, and I thought you might know the right person. Would you be open to introducing me? I'm happy to send a short note you can forward so it's no work on your end.\n\nThanks so much,\n${meFirst() || "[Your name]"}`;
+  return {channel:"Message", subject:"", message:body};
+}
+async function draftIntro(e, direct){
+  const topic = introTopic(findQuery);
+  const st = {busy:true}; introState.set(e.key, st); drawFindNow();
+  if (!sample){ st.draft = introTemplate(e, topic, direct); st.note = "starter template"; st.busy = false; drawFindNow(); return; }
+  const prompt = `The user wants to meet: "${findQuery}". Write a short message the user can send to someone they already know, asking for help.
+${direct
+  ? `This contact works at or fits what the user is looking for. Ask for a short chat about their work, and, if natural, whether they'd introduce the user to the right person on their team.`
+  : `This contact doesn't fit directly but may know the right people. Ask whether they'd be open to introducing the user to someone who fits. Make it easy to say yes or no.`}
+Rules: under 110 words. Open with something specific to this contact (a shared history, something they said, a personal detail), never "I hope this finds you well". Say in one sentence why the user wants this. One clear ask. Then, on its own after a blank line, add "Here's a short note you can forward:" and a 2-sentence blurb about the user in the third person, only for intro requests. No flattery. Sign with ${meFirst() || "[Your name]"}. Use only details given below; never invent facts about the user or the contact.
+
+Reply with only JSON: {"channel": "Text" | "LinkedIn" | "Email", "subject": "email subject or empty", "message": "the message"}
+
+${meText()}
+
+CONTACT: ${e.name}, ${e.role||""}${e.firm?" at "+e.firm:""}${e.industry?" ("+e.industry+")":""}
+HOW THEY MET: ${e.howMet||"(not noted)"}
+NOTES: ${e.notes||"(none)"}
+PERSONAL DETAILS: ${[...(e.remember||[]), ...(e.personal||[])].join(", ")||"(none)"}
+LAST CONTACT: ${e.last||"(unknown)"}`;
+  try{
+    const r = await sample.json(prompt, {cache:false});
+    if (!r?.message) throw {code:"invalid_json"};
+    st.draft = {channel:r.channel||"Message", subject:r.subject||"", message:r.message};
+  }catch(err){ st.draft = introTemplate(e, topic, direct); st.note = "AI unavailable, starter template"; }
+  st.busy = false; drawFindNow();
 }
 async function runFind(){
   const {list} = buildNetwork();
   findBusy = true; renderMain();
-  const st = $("#findSt"); if (st){ st.className = "status"; st.textContent = "Searching…"; }
+  const q = findQuery;
   const lines = list.slice(0, 400).map(e => [
     `key=${e.key}`, e.name, e.role, e.firm, e.industry, e.howMet && "met: " + e.howMet, e.tags.length && "tags: " + e.tags.join(", "),
     e.notes && "notes: " + e.notes.replace(/\s+/g, " ").slice(0, 300),
     (e.remember.length || e.personal.length) && "remember: " + [...e.remember, ...e.personal].join("; ").slice(0, 200),
     e.log.length && "history: " + e.log.slice(-3).map(x => x.note).filter(Boolean).join("; ").slice(0, 200)
   ].filter(Boolean).join(" | ")).join("\n");
-  const prompt = `You help the user search their personal network and find new people to meet.
+  const prompt = `You help the user find people in their network and get warm introductions.
 
 ${meText()}
 
-THE USER'S REQUEST: ${findQuery}
+THE USER WANTS TO MEET: ${q}
 
 THEIR CONTACTS (one per line; the key= value identifies each):
 ${lines || "(no contacts yet)"}
 
 Do three things:
-1. "matches": contacts who fit the request. Only include real fits based on the details given; never guess. Up to 8, best first, each with a short "why".
-2. "introducers": contacts who don't match directly but could plausibly introduce the user to people who do (same company, same industry, same school, or the notes say they know people there). Up to 4, each with a short "why". Empty if none.
+1. "matches": contacts who directly fit (e.g. work at the company named, or have the role asked about). Only real fits based on the details given; never guess. Up to 8, best first, each with a short "why".
+2. "introducers": contacts who don't fit directly but could plausibly introduce the user to someone who does: same industry, worked there before, the notes say they know people there, or a strong connector (alumni, mentor). Up to 4, each with a short "why" naming the specific reason. Empty if none.
 3. Searches for finding NEW people: "linkedin" is 2-3 LinkedIn people-search keyword strings (plain keywords like "Bain San Francisco Stanford", no quotes or operators; when the request says "my school" or "alumni", use the school from the user's profile), each with a short "label". "google" is 1-2 Google queries that search LinkedIn profiles, using site:linkedin.com/in and quoted terms, each with a short "label".
 Add a one-sentence "tip" on how to reach out to people found this way.
 
 Reply with only JSON: {"matches": [{"key": "", "why": ""}], "introducers": [{"key": "", "why": ""}], "linkedin": [{"label": "", "keywords": ""}], "google": [{"label": "", "query": ""}], "tip": ""}`;
   try{
     const data = await sample.json(prompt);
-    findResult = {q:findQuery, data};
+    if (q === findQuery) findResult = {q, data};
     findBusy = false;
     if (sel.type === "find") renderMain();
   }catch(err){
     findBusy = false;
-    if (sel.type === "find"){ renderMain(); const s2 = $("#findSt"); if (s2){ s2.className = "status err"; s2.textContent = errCopy(err); } }
+    if (sel.type === "find"){ renderMain(); const s2 = $("#findSt"); if (s2){ s2.className = "status err"; s2.textContent = "AI search didn't work, so these are quick matches. " + errCopy(err); } }
   }
 }
 
