@@ -28,7 +28,8 @@ function send(res, status, obj) {
 export default async function handler(req, res) {
   if (req.method !== "POST") return send(res, 405, { error: "Use POST" });
 
-  const key = process.env.ANTHROPIC_API_KEY;
+  // ANTHROPIC_API_KEY is the standard name; "anthro" is accepted because Vercel won't rename a sensitive variable once saved.
+  const key = process.env.ANTHROPIC_API_KEY || process.env.anthro;
   if (!key) return send(res, 500, { error: "ANTHROPIC_API_KEY is not set on the server" });
 
   // Optional: require an access code so a public link can't run up your API bill

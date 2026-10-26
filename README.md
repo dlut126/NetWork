@@ -2,6 +2,8 @@
 
 **A networking assistant for people who find reaching out and following up hard.**
 
+**Try it:** https://net-work-ten.vercel.app (no sign-up; your contacts stay in your own browser)
+
 Most people don't lose touch because they don't care. They lose touch because reaching out takes three things at once: remembering *when*, having a *reason*, and finding the *words*. NetWork handles all three. You tell it who you met, in your own words or by voice, and it keeps a lifelong map of your network, tells you who to reach out to (a few people at a time, never a flood), and drafts the message.
 
 Built as Build #1 for an MBA course on designing useful AI solutions. It's designed for anyone, not one person: each user sets up a short profile, and every AI feature works from it.
@@ -111,7 +113,7 @@ The same `index.html` also runs as a Claude artifact on claude.ai, where it uses
 
 **Data and privacy.** In this version your contacts are stored only in your own browser (localStorage). Nothing is stored on a server. The text of a note, prep, or transcript is sent to the Claude API only when you press a button that needs AI. Clearing your browser data erases your network, and it does not sync between devices.
 
-## Limitations of v1
+## Limitations
 
 - Reminders appear when you open the app; there are no push notifications or emails yet.
 - Voice input relies on your device's keyboard dictation; the app does not record audio itself.
@@ -119,13 +121,44 @@ The same `index.html` also runs as a Claude artifact on claude.ai, where it uses
 - In the hosted version, contacts are stored in the browser, so they don't sync across devices. Use the CSV download to back up or move them.
 - It doesn't listen to calls live; it works from the transcript afterward.
 
-## How we'll evaluate it
+## Workflow, decisions, and human approval points
 
-1. **Capture accuracy.** Dictate 20 real "who I met" notes and count fields parsed correctly (name, company, role, follow-up date).
-2. **Outreach rate.** Track messages sent to your network in a normal week, then in a week using NetWork.
-3. **Draft quality.** Share of drafted messages sent with no edits or light edits.
-4. **Nudge fatigue.** How often a nudge gets snoozed or ignored versus acted on. A high snooze rate means the reminders are too frequent.
-5. **Debrief accuracy.** For three mock coffee chats, compare the extracted takeaways and promises to what was actually said.
+The AI suggests; the person decides. Nothing is saved from an AI guess, and nothing is ever sent, without a person approving it.
+
+```mermaid
+flowchart TD
+  A["Who did you meet?<br/>name · sentence · photo · import"] --> R{"Router: just a name?"}
+  R -- "1–2 plain words" --> S["Saved instantly"]
+  S --> U(["👤 Undo if wrong"])
+  R -- "description, 3–4 words, or photo" --> AI["AI extracts people, company, role,<br/>how you met, what to remember"]
+  AI --> H1(["👤 Review cards → Save / Edit / Discard"])
+  H1 --> C[("Contacts<br/>stored in your browser or Claude account")]
+  S --> C
+  GM["Optional: Gmail + Calendar<br/>(off until you connect)"] -. "who you emailed and when,<br/>meetings with contacts" .-> C
+  C --> RULES{"Reminder rules<br/>how you met · promises · stay-in-touch · meetings"}
+  RULES --> T["Today: top 3 to-dos"]
+  T --> H2(["👤 Log · Not now · Message"])
+  H2 -- Message --> D["AI drafts a message"]
+  D --> H3(["👤 Edit, copy, and send it yourself"])
+  C --> G["Group email: one message,<br/>name + company + AI personal line"]
+  G --> H4(["👤 Review each email → copy, or create Gmail drafts<br/>(never sent automatically)"])
+  C --> P["Coffee chat prep → notes/transcript → AI debrief + thank-you"]
+  P --> H5(["👤 Review, edit, send"])
+```
+
+| Decision | Who makes it | Safeguard |
+|---|---|---|
+| Is this text a name or a description? | Rules ([evaluated](docs/evaluation.md)) | Ambiguous inputs go to the AI; **Undo** after instant saves |
+| Who's in this sentence or photo, and what do we know? | AI | **Human reviews every card** before saving; unreadable photo rows are skipped, not guessed |
+| Is this the same person as an existing contact? | AI + exact name match | Card says "Already in contacts"; person chooses Log it or Discard |
+| Who should I follow up with, and when? | Rules (how you met, promises, cadence, meetings) | Max 3 at a time; **Not now** on everything; per-person "stay in touch" setting |
+| What should the message say? | AI | **Person edits and sends**; the app never sends |
+| Group email to 30 people | Person writes it, AI adds personal lines | Preview and edit each one; Gmail drafts only, behind a confirm step; no duplicates |
+| Read my email or calendar? | Person | Off by default; Claude permission prompt; reads only who and when, never message content |
+
+## Evaluation
+
+See [docs/evaluation.md](docs/evaluation.md) for the full results. In short: the original rules for "is this just a name?" created **13 wrong contacts out of 25 descriptions** on a held-out test set. The shipped version creates **1** (95% routed correctly), and **Undo** covers the remaining case.
 
 ## What's next
 

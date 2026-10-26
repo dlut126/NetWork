@@ -365,6 +365,7 @@ const EXAMPLE_PEOPLE = [
    howMet:"Worked together at your first job", metHow:"in_person", notes:"Moved from analytics into product management. Good person to ask about switching careers.", lastContact:"2026-10-01", followUp:""}
 ];
 
+
 // ---------- State ----------
 let people = [], chats = [];
 let db = null, uid = null, sample = null, useLocal = false;
@@ -693,12 +694,26 @@ function renderToday(m){
 // ---------- Add (one box: a name, a sentence, or a photo) ----------
 let quickContext = "";          // "Where": remembered so you can add a whole event quickly
 let quickMet = "in_person", capU = "aq";
+// Decides whether typed text is just a name (save instantly) or a description (send to the AI).
+// Evaluated on a held-out set: see docs/evaluation.md. Uses general signal words, never company names,
+// and sends 3-4 plain words to the AI because "Rachel Green Ralph Lauren" and "Maria del Carmen Ruiz" look alike to rules.
 const NAME_STOP = new Set(["met","meet","at","from","with","and","the","a","an","had","have","coffee","call","called","talked","talk","she","he","they","her","his","is","was","works","work","to","for","today","yesterday","who","we","i","my","about","in","on","said","follow","up"]);
-function isJustName(t){
-  const w = t.trim().split(/\s+/);
-  if (!w.length || w.length > 4 || /[0-9@,.;:!?()]/.test(t.replace(/\.(?=\s|$)/g, ""))) return false;
-  return w.every(x => /^[\p{L}][\p{L}'’-]*\.?$/u.test(x) && !NAME_STOP.has(x.toLowerCase()));
+const SIGNAL_WORDS = new Set([...NAME_STOP,"w","re","via","by","into","of","lunch","dinner","drinks","breakfast","zoom","chat","chatted","spoke","speak","bumped","ran","saw","emailed","email","texted","text","dm","dmed","messaged","intro","introduced","ping","pinged","reach","reached","mixer","event","panel","conference","club","recruiter","recruiting","ceo","cto","cfo","coo","vp","svp","evp","pm","apm","founder","cofounder","manager","director","partner","principal","analyst","associate","consultant","engineer","designer","ae","se","sdr","intern","mba","professor","prof","product","sales","marketing","tomorrow","tonight","next","week","again","asked"]);
+const NAME_PARTICLES = new Set(["van","von","der","den","de","da","del","della","di","du","la","le","st","st.","bin","al","ibn","jr","jr.","sr","sr.","ii","iii","ní","nic","mac","o"]);
+function routeCapture(t){
+  const s = t.trim(); if (!s) return "empty";
+  const w = s.split(/\s+/);
+  if (/[0-9@,;:!?()&/+]|\s[-–—]\s/.test(s)) return "ai";
+  if (!w.every(x => /^[\p{L}][\p{L}'’.-]*$/u.test(x))) return "ai";
+  if (w.some(x => SIGNAL_WORDS.has(x.toLowerCase().replace(/\.$/, "")))) return "ai";
+  if (w.length <= 2) return "name";
+  if (w.length <= 4 && w.slice(1, -1).some(x => NAME_PARTICLES.has(x.toLowerCase()))) return "name";
+  if (w.length <= 4 && NAME_PARTICLES.has(w.at(-1).toLowerCase())) return "name";
+  return "ai";
 }
+// Without AI (e.g. a copy with no API key), any short run of plain words is treated as a name.
+const plainWords = t => { const w = t.trim().split(/\s+/); return w.length <= 4 && routeCapture(t) !== "empty" && !/[0-9@,;:!?()&/+]/.test(t) && w.every(x => /^[\p{L}][\p{L}'’.-]*$/u.test(x) && !SIGNAL_WORDS.has(x.toLowerCase().replace(/\.$/, ""))); };
+function isJustName(t){ const r = routeCapture(t); return r === "name" || (r === "ai" && !sample && plainWords(t)); }
 
 function captureHTML(u){
   return `<label class="label" for="${u}-in">Who did you meet?</label>
@@ -770,7 +785,8 @@ async function runCapture(u){
     renderSide(); box.focus();
     const e = findEntry(keyOf(p.name, p.firm));
     st.className = "status";
-    st.innerHTML = `Saved <button class="linkish" id="${u}-open">${esc(p.name)}</button>. <a href="${esc(linkedinSearch(e))}" target="_blank" rel="noopener">Find on LinkedIn</a>${quickContext ? ` · Add the next person from ${esc(quickContext)}` : ""}`;
+    st.innerHTML = `Saved <button class="linkish" id="${u}-open">${esc(p.name)}</button> · <button class="linkish" id="${u}-undo">Undo</button> · <a href="${esc(linkedinSearch(e))}" target="_blank" rel="noopener">Find on LinkedIn</a>${quickContext ? ` · Add the next person from ${esc(quickContext)}` : ""}`;
+    $("#"+u+"-undo").onclick = async () => { await removeDoc(p.id); renderSide(); box.value = text; st.className = "status"; st.textContent = `Removed ${p.name}. Add a little more detail, like “${p.name.split(" ")[0]} from …”, and press Add.`; box.focus(); };
     $("#"+u+"-open").onclick = () => go({type:"person", key:keyOf(p.name, p.firm)});
     return;
   }
@@ -2427,6 +2443,7 @@ function errCopy(e){
   }
 }
 
+
 // ---------- Standalone AI (used when not running inside Claude) ----------
 function parseLoose(t){
   try{ return JSON.parse(t); }catch{}
@@ -2477,6 +2494,7 @@ function makeServerSample(){
   s.limits = async () => ({maxPromptBytes: 200000, images: {maxCount: 4, maxInputBytes: 20 * 1024 * 1024, mediaTypes: ["image/jpeg","image/png","image/webp","image/gif"]}});
   return s;
 }
+
 
 // ---------- Boot ----------
 render();

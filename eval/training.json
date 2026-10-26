@@ -1,0 +1,11 @@
+[
+  ["Sarah Kim", "name"], ["sarah kim", "name"], ["Tom Reyes", "name"], ["María José García", "name"], ["Dr. Lisa Wong", "name"],
+  ["Jean-Luc Picard", "name"], ["Siobhán O’Brien", "name"], ["Priya", "name"], ["J. Smith", "name"], ["Mary Anne Van Dyke", "name"],
+  ["Kwame Mensah", "name"], ["Ana de la Cruz", "name"], ["Li Wei", "name"], ["Ahmed", "name"], ["Chris O'Neil", "name"],
+  ["Met Sarah Kim", "description"], ["Sarah Kim from Google", "description"], ["coffee with Jen", "description"], ["Jen Ortiz, Stripe PM", "description"],
+  ["Tom at Bain", "description"], ["Met Sarah at the alumni night, she's a PM at Google", "description"], ["Sarah Kim Google PM", "description"],
+  ["Lunch with Marcus", "description"], ["Ran into David Chen", "description"], ["Sarah Kim McKinsey", "description"], ["Sarah, Tom, and Jen", "description"],
+  ["Priya Bain", "description"], ["Sarah Kim follow up", "description"], ["Zoom with Nina", "description"], ["Intro to Lena via Jen", "description"],
+  ["Sarah Kim (Google)", "description"], ["sarah@google.com", "description"], ["Call Omar tomorrow", "description"], ["Drinks with Grace Liu", "description"],
+  ["Sarah Kim 415-555-0100", "description"]
+]
