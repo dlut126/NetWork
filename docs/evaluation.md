@@ -105,7 +105,7 @@ Plus a **stress set**: sheets 3, 8, and 9 made much worse (heavy blur, dark, low
 
 ## Evaluation 3: importing spreadsheets
 
-People usually keep contacts in Excel, with their own column names. We built 5 test files with answer keys ([`eval/spreadsheets/`](../eval/spreadsheets)) and check every field of every person ([`eval/tests/spreadsheet-import.test.mjs`](../eval/tests/spreadsheet-import.test.mjs), `npm test`):
+People usually keep contacts in Excel, with their own column names. We built 7 test files with answer keys ([`eval/spreadsheets/`](../eval/spreadsheets)) and check every field of every person ([`eval/tests/spreadsheet-import.test.mjs`](../eval/tests/spreadsheet-import.test.mjs), `npm test`):
 
 | File | What makes it hard | Without AI | With AI |
 |---|---|---|---|
@@ -114,6 +114,10 @@ People usually keep contacts in Excel, with their own column names. We built 5 t
 | 3-career-office.xls | Old Excel format; "Contact Name", "Organization", "E-mail Address", "Mobile", "LinkedIn URL" | ✓ | ✓ |
 | 4-unusual-headers.xlsx | "Who I talked to", "Where they're at now", "What they do", "Reach them", "When" | Asks for a Name header (correct) | ✓ mapped by AI |
 | 5-no-names.xlsx | Event attendance counts, no people | Refused (correct) | Refused (correct) |
+| 6-crammed-cells.xlsx | Two rows typed as one sentence in the Name cell ("Met Jake Morales at the Bain info session, jake.morales@bain.com, follow up Friday") | Kept, full text in notes (nothing lost) | ✓ split by AI |
+| 7-sentences-only.xlsx | No columns at all: each row is a sentence about someone | Explains it needs AI | ✓ split by AI |
+
+**AI splitting, live.** With the real model, all 5 sentence rows came out right: name, company, role, email, phone, how they met ("intro from Jen"), dates ("on 10/14", and "follow up Friday" as that Friday's date), and promises in notes. It took under 3 seconds per file. Split people are marked ✦ in the preview so the user checks them.
 
 **Real-world check.** We then ran a real 120-person consulting club contact tracker (kept out of the repo for privacy). It broke the importer in ways the test files didn't. The "Practice Area" header sat over the email column, so **0 of 120 emails** came through. It also had a placeholder email ("NEED"), an email with a comment after it, LinkedIn cells showing "Name | LinkedIn" with the real link stored as a hyperlink underneath, tracking codes in URLs, a date typed "Oct 9th", and about 930 empty formatted rows. Fixes:
 - detect email and LinkedIn columns by their contents
