@@ -1612,7 +1612,7 @@ const COLMAP = [
   ["name",        /^(name|names|full name|contact|contact name|person|who|attendee|guest|candidate|connection|people|person name)$/],
   ["firm",        /(company|organi[sz]ation|^firm|employer|^org$|^business|works? at|where (they|he|she) works?|^school)/],
   ["role",        /(title|position|role|^job|function|seniority|level)/],
-  ["industry",    /(industry|sector|^field$|vertical)/],
+  ["industry",    /(industry|sector|^field$|vertical|practice|^area$|specialty|focus)/],
   ["tags",        /(^tags?$|category|^group|^type$|^status$|^list$|^label|priority|tier)/],
   ["notes",       /(notes?|comments?|details|summary|remarks|next steps?|topics?|discussed|takeaways?|^about$|^info$)/],
 ];
@@ -1636,14 +1636,43 @@ function findHeader(rows){
 function toYmdLoose(v){
   if (v == null || v === "") return "";
   if (v instanceof Date) return isNaN(v) ? "" : ymd(v);
-  const s = String(v).trim();
+  const s = String(v).trim().replace(/(\d)(st|nd|rd|th)\b/gi, "$1");   // "Oct 9th"
   if (/^\d{5}(\.\d+)?$/.test(s)){ const n = Number(s); if (n > 20000 && n < 80000) return ymd(new Date(Math.round((n - 25569) * 86400000) + new Date().getTimezoneOffset() * 60000)); }
   if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
   let t = new Date(s);
-  if (!isNaN(t) && t.getFullYear() < 2000 && !/\d{4}/.test(s)) t.setFullYear(new Date().getFullYear());   // "Oct 22" with no year
+  if (!isNaN(t) && !/\d{4}/.test(s)){ t.setFullYear(new Date().getFullYear()); if (ymd(t) > today()) t.setFullYear(t.getFullYear() - 1); }   // "Oct 22" with no year: the most recent one
   return isNaN(t) || t.getFullYear() < 1950 ? "" : ymd(t);
 }
+// Checks columns by their contents too, because real sheets drift: a header can sit one column off from its data.
+// A column that is mostly emails is the email column (same for LinkedIn URLs), whatever its header says. If that
+// moves a header's field off its column, the field goes to an unlabeled neighbor that holds plain text.
+const looksEmail = v => /^\s*(mailto:)?[^\s@]+@[^\s@]+\.[a-z]{2,}\s*$/i.test(String(v ?? ""));
+const looksLinkedIn = v => /linkedin\.com\//i.test(String(v ?? ""));
+function refineMap(rows, hi, map){
+  const body = rows.slice(hi + 1, hi + 201), head = rows[hi] || [];
+  const width = Math.max(...body.map(r => r.length), head.length);
+  const share = (j, test) => { const vals = body.map(r => r[j]).filter(v => String(v ?? "").trim()); return vals.length >= 2 ? vals.filter(test).length / vals.length : 0; };
+  const m = {...map}, moved = [];
+  for (const [field, test] of [["email", looksEmail], ["linkedin", looksLinkedIn]]){
+    if (m[field] !== undefined && share(m[field], test) >= 0.6) continue;           // header already right
+    let best = -1, bs = 0;
+    for (let j = 0; j < width; j++){ const sh = share(j, test); if (sh > bs){ bs = sh; best = j; } }
+    if (best < 0 || bs < 0.6) continue;
+    const displaced = Object.keys(m).find(f => f !== field && m[f] === best);
+    if (displaced){ delete m[displaced]; moved.push(displaced); }
+    m[field] = best;
+  }
+  for (const f of moved){   // e.g. "Practice Area" sat over the emails; its data is in the blank-header column beside it
+    const taken = new Set(Object.values(m));
+    const col = [m.email - 1, m.email + 1, m.linkedin - 1, m.linkedin + 1].find(j => j >= 0 && !taken.has(j) && !String(head[j] ?? "").trim()
+      && share(j, v => !looksEmail(v) && !looksLinkedIn(v) && !(v instanceof Date) && /\p{L}/u.test(String(v))) >= 0.8);
+    if (col !== undefined) m[f] = col;
+  }
+  // A header that names one field but holds another: record it so the preview can show both names
+  return m;
+}
 function rowsToPeople(rows, hi, map){
+  map = refineMap(rows, hi, map);
   const fromLinkedIn = rows[hi].some(c => normHead(c) === "connected on");
   const get = (r, f) => map[f] !== undefined && map[f] >= 0 ? (r[map[f]] instanceof Date ? r[map[f]] : String(r[map[f]] ?? "").trim()) : "";
   const out = [];
@@ -1655,12 +1684,20 @@ function rowsToPeople(rows, hi, map){
     lastName = name;
     const last = toYmdLoose(get(r, "lastContact")), fu = toYmdLoose(get(r, "followUp"));
     const tags = String(get(r, "tags") || "").split(/[;,|]/).map(x => x.trim()).filter(Boolean).slice(0, 5);
-    out.push({name, firm:String(get(r, "firm")), role:String(get(r, "role")), email:String(get(r, "email")).replace(/^mailto:/i, ""), phone:String(get(r, "phone")),
-      linkedin:String(get(r, "linkedin")).replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, ""), industry:String(get(r, "industry")),
-      howMet:String(get(r, "howMet")), tags, notes:String(get(r, "notes")),
+    // Placeholders like "NEED" or "TBD" in the email or LinkedIn column go to notes instead of becoming a bad address
+    // An email cell can carry extra words ("jo@x.com (personal)"): keep the address, move the words to notes
+    const emCell = String(get(r, "email")).replace(/^mailto:/i, "").trim(), emHit = emCell.match(/[^\s@()<>,;"']+@[^\s@()<>,;"']+\.[a-z]{2,}/i);
+    const em = emHit ? emHit[0] : emCell, emRest = emHit ? emCell.replace(emHit[0], "").replace(/^[\s()\-–,;:]+|[\s()\-–,;:]+$/g, "") : "";
+    const liRaw = String(get(r, "linkedin")).trim().replace(/[?#].*$/, "");
+    const stray = [em && !looksEmail(em) ? `Email: ${em}` : "", emRest ? `Email note: ${emRest}` : "", liRaw && !/linkedin\.com|^[\w-]+$/i.test(liRaw) ? `LinkedIn: ${liRaw}` : ""].filter(Boolean);
+    out.push({name, firm:String(get(r, "firm")), role:String(get(r, "role")), email: looksEmail(em) ? em : "", phone:String(get(r, "phone")),
+      linkedin: stray.some(x => x.startsWith("LinkedIn")) ? "" : liRaw.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, ""), industry:String(get(r, "industry")),
+      howMet:String(get(r, "howMet")), tags, notes:[String(get(r, "notes")), ...stray].filter(Boolean).join(" · "),
       date: last && last <= today() ? last : "", followUp: fu});
   }
-  const used = Object.fromEntries(Object.entries(map).filter(([, i]) => i >= 0).map(([f, i]) => [f, String(rows[hi][i] ?? "").trim() || `column ${i + 1}`]));
+  const colName = i => String(rows[hi][i] ?? "").trim() ? `“${String(rows[hi][i]).trim()}”` : `unlabeled column ${String.fromCharCode(65 + (i % 26))}`;
+  const byContent = f => (f === "email" || f === "linkedin") && !COLMAP.find(([g]) => g === f)[1].test(normHead(rows[hi][map[f]]));
+  const used = Object.fromEntries(Object.entries(map).filter(([, i]) => i >= 0).map(([f, i]) => [f, colName(i) + (byContent(f) ? ` (its cells are ${f === "email" ? "email addresses" : "LinkedIn links"})` : "")]));
   return {people:out, fromLinkedIn, used};
 }
 // When the headers are too unusual for the rules, ask the AI which column is which (it sees the header and 5 rows only)
@@ -1714,7 +1751,11 @@ async function readSpreadsheet(buf){
   const wb = X.read(buf, {type:"array", cellDates:true});
   let best = null;
   for (const name of wb.SheetNames){
-    const rows = X.utils.sheet_to_json(wb.Sheets[name], {header:1, raw:true, defval:""});
+    const ws = wb.Sheets[name];
+    // Pasted links often show a page title ("Jane Doe | LinkedIn") over the real URL; use the URL underneath
+    for (const ref of Object.keys(ws)){ const c = ws[ref]; const url = c?.l?.Target;
+      if (url && /^(https?:|mailto:)/i.test(url) && !/^(https?:|mailto:|www\.)/i.test(String(c.v ?? "")) && !String(c.v ?? "").includes("@")){ c.v = url.replace(/^mailto:/i, ""); c.t = "s"; delete c.w; } }
+    const rows = X.utils.sheet_to_json(ws, {header:1, raw:true, defval:""});
     const h = findHeader(rows.filter(r => r.some(c => String(c ?? "").trim() !== "")));
     const score = (h ? 1000 : 0) + rows.length;
     if (!best || score > best.score) best = {name, rows, score};
